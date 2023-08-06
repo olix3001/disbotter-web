@@ -1,0 +1,69 @@
+
+<script lang="ts">
+	import { DisbotterProject } from "$lib/editor/project";
+    import Navbar from "../../components/editor/Navbar.svelte";
+	import ProjectProvider from "../../components/editor/ProjectProvider.svelte";
+	import { Pane, Splitpanes } from "svelte-splitpanes";
+
+    let project = new DisbotterProject('New project');
+</script>
+
+<div style="width: 100vw; height: 100vh; overflow: hidden;">
+    <Navbar />
+
+    <div class="topbar">
+        <p class="project-name">{project.name}</p>
+    </div>
+
+    <ProjectProvider bind:project>
+        <Splitpanes style="height: 100%" theme="dark-splitpane-theme">
+            <Pane minSize={12} size={15}>
+                <div class="sidebar pane">
+                    <h3>Project structure</h3>
+                </div>
+            </Pane>
+            <Pane minSize={40}>
+                <div class="editor pane">
+                    <h3>Editor</h3>
+                </div>
+            </Pane>
+            <Pane minSize={12} size={15}>
+                <div class="properties pane">
+                    <h3>Properties</h3>
+                </div>
+            </Pane>
+        </Splitpanes>
+    </ProjectProvider>
+</div>
+
+<style>
+    h3 {
+        margin: 0;
+        padding: 1rem;
+    }
+
+    .pane {
+        color: var(--white);
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .sidebar, .properties {
+        background-color: #0f0f0f;
+    }
+
+    .topbar {
+        width: 100%;
+        background-color: #0f0f0f;
+        display: flex;
+        flex-direction: row;
+        border: 1.5px solid #313131;
+    }
+
+    .project-name {
+        margin: 1em;
+        font-weight: 700;
+    }
+</style>
