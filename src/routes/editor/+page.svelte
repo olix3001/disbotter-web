@@ -4,6 +4,7 @@
     import Navbar from "../../components/editor/Navbar.svelte";
 	import ProjectProvider from "../../components/editor/ProjectProvider.svelte";
 	import { Pane, Splitpanes } from "svelte-splitpanes";
+	import ProjectStructure from "../../components/editor/ProjectStructure.svelte";
 
     let project = new DisbotterProject('New project');
 </script>
@@ -19,7 +20,7 @@
         <Splitpanes style="height: 100%" theme="dark-splitpane-theme">
             <Pane minSize={12} size={15}>
                 <div class="sidebar pane">
-                    <h3>Project structure</h3>
+                    <ProjectStructure />
                 </div>
             </Pane>
             <Pane minSize={40}>

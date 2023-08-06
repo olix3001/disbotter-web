@@ -12,9 +12,14 @@
         padding: 0;
         background-color: #1f1f1f;
         color: var(--white);
+        user-select: none;
     }
 
     :global(.splitpanes) {
+        background-color: #1f1f1f;
+    }
+
+    :global(.splitpanes__pane) {
         background-color: #1f1f1f;
     }
 
@@ -28,6 +33,10 @@
 
     :global(.splitpanes__splitter:hover) {
         background-color: #057bd0;
+    }
+
+    :global(p) {
+        margin: 0;
     }
 </style>
 
