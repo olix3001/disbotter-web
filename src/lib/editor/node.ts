@@ -36,6 +36,9 @@ export interface ENode {
 	inputs: { [key: string]: NodeConnection };
 	outputs: { [key: string]: NodeConnection };
 
+	inputHardcoded: { [key: string]: any };
+	outputHardcoded: { [key: string]: any };
+
 	self?: HTMLElement;
 }
 

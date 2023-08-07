@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
 	import { getContext } from "svelte";
+	import NodeView from "./NodeView.svelte";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     type Vec2 = { x: number, y: number };
@@ -76,14 +77,25 @@
         >
             <defs>
                 <pattern id="dots" width={PATTERN_SIZE} height={PATTERN_SIZE} patternUnits="userSpaceOnUse" x={editorOffset.x} y={editorOffset.y}>
-                    <circle cx={PATTERN_SIZE_HALF} cy={PATTERN_SIZE_HALF} r={PATTERN_SIZE_HALF} fill="var(--editor-background)" />
+                    <circle cx={PATTERN_SIZE_HALF} cy={PATTERN_SIZE_HALF} r={PATTERN_SIZE_HALF} fill="var(--editor-dots)" />
                 </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#dots)"></rect>
         </svg>
 
         <div class="editor-content" bind:this={EDITOR_CONTENT} style={transformCSS}>
-            <p>Hello world!</p>
+            <NodeView node={{
+                id: 'onCommand',
+                type: $PROJECT.commands[0].flow.availableNodes[0],
+
+                x: 0,
+                y: 0,
+
+                inputs: {},
+                outputs: {},
+                inputHardcoded: {},
+                outputHardcoded: {},
+            }} currentZoom={editorZoom}/>
         </div>
 
      </div>
@@ -114,6 +126,7 @@
         width: 100%;
         position: relative;
         overflow: hidden;
+        background-color: var(--editor-background);
     }
 
     .editor-background {

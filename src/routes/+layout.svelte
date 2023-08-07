@@ -1,7 +1,8 @@
 <style global>
     :root {
         --white: #eeeeee;
-        --editor-background: #3f3f3f;
+        --editor-background: #070808;
+        --editor-dots: #1f1f1f;
     }
 
     :root {
