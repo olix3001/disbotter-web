@@ -1,6 +1,7 @@
 <style global>
     :root {
         --white: #eeeeee;
+        --editor-background: #3f3f3f;
     }
 
     :root {

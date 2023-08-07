@@ -5,6 +5,8 @@
 	import ProjectProvider from "../../components/editor/ProjectProvider.svelte";
 	import { Pane, Splitpanes } from "svelte-splitpanes";
 	import ProjectStructure from "../../components/editor/ProjectStructure.svelte";
+	import NodeEditor from "../../components/editor/nodes/NodeEditor.svelte";
+	import Properties from "../../components/editor/Properties.svelte";
 
     let project = new DisbotterProject('New project');
 </script>
@@ -25,12 +27,12 @@
             </Pane>
             <Pane minSize={40}>
                 <div class="editor pane">
-                    <h3>Editor</h3>
+                    <NodeEditor />
                 </div>
             </Pane>
             <Pane minSize={12} size={15}>
                 <div class="properties pane">
-                    <h3>Properties</h3>
+                    <Properties />
                 </div>
             </Pane>
         </Splitpanes>
@@ -38,11 +40,6 @@
 </div>
 
 <style>
-    h3 {
-        margin: 0;
-        padding: 1rem;
-    }
-
     .pane {
         color: var(--white);
         width: 100%;

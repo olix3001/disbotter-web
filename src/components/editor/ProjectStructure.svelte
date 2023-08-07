@@ -7,7 +7,7 @@
 
     function addCommand() {
         PROJECT.update(p => {
-            p.commands.push(new Command('New command', ''));
+            p.addCommand(new Command('New Command', ''));
             return p;
         });
     }

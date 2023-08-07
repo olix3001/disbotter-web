@@ -9,6 +9,7 @@ export class DisbotterProject {
 	public name: string;
 
 	public commands: Command[] = [];
+	public currentlyEditing: { type: 'command'; command?: Command } | null = null;
 
 	constructor(name: string) {
 		this.name = name;
@@ -16,6 +17,7 @@ export class DisbotterProject {
 
 	public addCommand(command: Command): void {
 		this.commands.push(command);
+		this.currentlyEditing = { type: 'command', command };
 	}
 }
 
