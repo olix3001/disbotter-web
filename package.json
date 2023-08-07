@@ -31,7 +31,9 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/uuid": "^9.0.2",
 		"node-sass": "^9.0.0",
-		"svelte-splitpanes": "^0.8.0"
+		"svelte-splitpanes": "^0.8.0",
+		"uuid": "^9.0.0"
 	}
 }
