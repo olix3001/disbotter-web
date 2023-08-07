@@ -19,6 +19,14 @@ export class DisbotterProject {
 		this.commands.push(command);
 		this.currentlyEditing = { type: 'command', command };
 	}
+
+	public getCurrentFlow(): NodeFlow | null {
+		if (this.currentlyEditing?.type === 'command') {
+			return this.currentlyEditing.command?.flow ?? null;
+		}
+
+		return null;
+	}
 }
 
 const commandAvailableNodes = [
@@ -26,6 +34,88 @@ const commandAvailableNodes = [
 		id: 'onCommand',
 		title: 'On Command',
 		description: 'Triggered when a command is executed',
+		category: 'Events',
+		color: '#e91e63',
+		icon: '/icons/editor/trigger.png',
+
+		inputs: {},
+		outputs: {
+			__flow_out__: {
+				type: 'flow',
+				name: 'Flow'
+			}
+		},
+
+		action: (node: Node, inputs: NodeIO): NodeIO => {
+			return {};
+		}
+	},
+	{
+		id: 'testb',
+		title: 'Hello world',
+		description:
+			'lasdasjhdias hiud hasd hahs edahs iudbnsjk dbashjvg duyasb dygiqwbiu bahjbd sahyb dihasb djhbwqjuhqb hdbsa bdkahs bdhdbqwb jhbdvsa bw',
+		category: 'Events',
+		color: '#e91e63',
+		icon: '/icons/editor/trigger.png',
+
+		inputs: {},
+		outputs: {
+			__flow_out__: {
+				type: 'flow',
+				name: 'Flow'
+			}
+		},
+
+		action: (node: Node, inputs: NodeIO): NodeIO => {
+			return {};
+		}
+	},
+	{
+		id: 'helloworld',
+		title: 'Hello world',
+		description: 'Returns a hello world message',
+		category: 'Events',
+		color: '#e91e63',
+		icon: '/icons/editor/trigger.png',
+
+		inputs: {},
+		outputs: {
+			__flow_out__: {
+				type: 'flow',
+				name: 'Flow'
+			}
+		},
+
+		action: (node: Node, inputs: NodeIO): NodeIO => {
+			return {};
+		}
+	},
+	{
+		id: 'bruh',
+		title: 'Bruh',
+		description: 'I won\t even bother to describe this',
+		category: 'Events',
+		color: '#e91e63',
+		icon: '/icons/editor/trigger.png',
+
+		inputs: {},
+		outputs: {
+			__flow_out__: {
+				type: 'flow',
+				name: 'Flow'
+			}
+		},
+
+		action: (node: Node, inputs: NodeIO): NodeIO => {
+			return {};
+		}
+	},
+	{
+		id: 'last',
+		title: 'Last one',
+		description: 'Last node',
+		category: 'Events',
 		color: '#e91e63',
 		icon: '/icons/editor/trigger.png',
 

@@ -2,6 +2,7 @@
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
 	import { getContext } from "svelte";
 	import NodeView from "./NodeView.svelte";
+	import SearchContext from "./SearchContext.svelte";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     type Vec2 = { x: number, y: number };
@@ -55,6 +56,21 @@
         }
     }
 
+    let openContext: ({ x, y }: { x: number, y: number }) => void;
+    let closeContext: () => void;
+    function openContextMenu(e: MouseEvent) {
+        // Calcualte position relative to top left of editor
+        const rect = EDITOR.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        openContext({ x, y });
+    }
+    function closeContextMenu(e: MouseEvent) {
+        if (e.button !== 2) {
+            closeContext();
+        }
+    }
 </script>
 
 {#if $PROJECT.currentlyEditing === null}
@@ -67,6 +83,8 @@
      <div 
         class="editor"
         bind:this={EDITOR}
+        on:contextmenu|preventDefault|stopPropagation={openContextMenu}
+        on:mousedown={closeContextMenu}
         >
         <svg 
             class="editor-background"
@@ -97,7 +115,7 @@
                 outputHardcoded: {},
             }} currentZoom={editorZoom}/>
         </div>
-
+        <SearchContext bind:openContext bind:closeContext />
      </div>
 {/if}
 
@@ -125,7 +143,7 @@
         height: 100%;
         width: 100%;
         position: relative;
-        overflow: hidden;
+        overflow: clip;
         background-color: var(--editor-background);
     }
 

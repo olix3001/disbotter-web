@@ -2,6 +2,7 @@ export interface NodeType {
 	id: string;
 	title: string;
 	description: string;
+	category: string;
 	color: string;
 	icon: string;
 
