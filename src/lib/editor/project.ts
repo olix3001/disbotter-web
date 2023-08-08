@@ -1,5 +1,5 @@
 import type { Writable } from 'svelte/store';
-import type { ENode, NodeFlow, NodeIO } from './node';
+import { NodeConnectionType, type ENode, type NodeFlow, type NodeIO } from './node';
 import { v4 as uuidv4 } from 'uuid';
 
 export const projectKey = Symbol('disbotter project');
@@ -45,7 +45,7 @@ export class DisbotterProject {
 	}
 }
 
-const commandAvailableNodes = [
+const commandAvailableNodes: any = [
 	{
 		id: 'onCommand',
 		title: 'On Command',
@@ -57,8 +57,13 @@ const commandAvailableNodes = [
 		inputs: {},
 		outputs: {
 			__flow_out__: {
-				type: 'flow',
+				type: NodeConnectionType.Flow,
 				name: 'Flow'
+			},
+			interaction: {
+				type: NodeConnectionType.Structure,
+				name: 'Interaction',
+				struct: {}
 			}
 		},
 
@@ -67,78 +72,27 @@ const commandAvailableNodes = [
 		}
 	},
 	{
-		id: 'testb',
-		title: 'Hello world',
-		description:
-			'lasdasjhdias hiud hasd hahs edahs iudbnsjk dbashjvg duyasb dygiqwbiu bahjbd sahyb dihasb djhbwqjuhqb hdbsa bdkahs bdhdbqwb jhbdvsa bw',
-		category: 'Events',
+		id: 'Reply',
+		title: 'Reply',
+		description: 'Replies to the interaction/message',
+		category: 'Actions',
 		color: '#e91e63',
 		icon: '/icons/editor/trigger.png',
 
-		inputs: {},
-		outputs: {
-			__flow_out__: {
-				type: 'flow',
+		inputs: {
+			__flow_in__: {
+				type: NodeConnectionType.Flow,
 				name: 'Flow'
+			},
+			interaction: {
+				type: NodeConnectionType.Structure,
+				name: 'Interaction',
+				struct: {}
 			}
 		},
-
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	},
-	{
-		id: 'helloworld',
-		title: 'Hello world',
-		description: 'Returns a hello world message',
-		category: 'Events',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
-
-		inputs: {},
 		outputs: {
 			__flow_out__: {
-				type: 'flow',
-				name: 'Flow'
-			}
-		},
-
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	},
-	{
-		id: 'bruh',
-		title: 'Bruh',
-		description: 'I won\t even bother to describe this',
-		category: 'Events',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
-
-		inputs: {},
-		outputs: {
-			__flow_out__: {
-				type: 'flow',
-				name: 'Flow'
-			}
-		},
-
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	},
-	{
-		id: 'last',
-		title: 'Last one',
-		description: 'Last node',
-		category: 'Events',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
-
-		inputs: {},
-		outputs: {
-			__flow_out__: {
-				type: 'flow',
+				type: NodeConnectionType.Flow,
 				name: 'Flow'
 			}
 		},

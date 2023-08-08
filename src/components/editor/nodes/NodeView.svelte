@@ -2,6 +2,7 @@
 	import type { ENode } from "$lib/editor/node";
 	import { getContext, onDestroy } from "svelte";
 	import type { Writable } from "svelte/store";
+	import NodeConnector from "./NodeConnector.svelte";
 
     export let node: ENode;
     export let currentZoom: number;
@@ -54,22 +55,39 @@
         >
         <!-- If node has __flow_in__ then it should be there -->
         {#if node.type.inputs.__flow_in__}
-            <!-- TODO: Put flow input connection here -->
+            <NodeConnector color="white" style="double" />
         {/if}
 
-        <div>
+        <div class="nvh-info">
             <p class="nvh-title">{node.type.title}</p>
             <p class="nvh-desc">{node.type.description}</p>
         </div>
 
         <!-- If node has __flow_out__ then it should be there -->
         {#if node.type.outputs.__flow_out__}
-            <!-- TODO: Put flow output connection here -->
+            <NodeConnector color="white" style="double" />
         {/if}
     </div>
     <div class="node-view-body">
-        <div class="node-view-body-content">
-            
+        <div class="nvb-inputs">
+            {#each Object.entries(node.type.inputs) as input}
+                {#if input[0] !== "__flow_in__"}
+                    <div class="nf-block nf-i">
+                        <NodeConnector type={input[1].type} />
+                        <p>{input[0]}</p>
+                    </div>
+                {/if}
+            {/each}
+        </div>
+        <div class="nvb-outputs">
+            {#each Object.entries(node.type.outputs) as output}
+                {#if output[0] !== "__flow_out__"}
+                    <div class="nf-block nf-o">
+                        <p>{output[0]}</p>
+                        <NodeConnector type={output[1].type} />
+                    </div>
+                {/if}
+            {/each}
         </div>
     </div>
 </div>
@@ -86,7 +104,7 @@
         border-radius: 10px;
         overflow: hidden;
         position: absolute;
-        min-width: 130px;
+        min-width: 135px;
     }
 
     .node-view-header {
@@ -94,16 +112,55 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+        justify-content: space-between;
         padding: .35em;
         cursor: pointer;
+        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+    }
+
+    .nvb-inputs {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        flex-basis: 50%;
+    }
+
+    .nvb-outputs {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        width: 100%;
+        height: 100%;
+        flex-basis: 50%;
+    }
+    .nf-block {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.3em;
+        padding-top: 0.5em;
+    }
+
+    .nf-i {
+        justify-content: flex-start;
+    }
+    .nf-o {
+        justify-content: flex-end;
+    }
+
+    .nf-block > p {
+        color: #c0c0c0;
+        font-weight: 500;
+        font-size: xx-small;
     }
 
     .node-view-body {
         display: flex;
-        flex-direction: column;
-        background-color: #1f1f1f;
-        border: 2px solid #1f1f1f;
-        padding: 0.5em;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.1em;
+        padding-bottom: 0.3em;
     }
 
     .nvh-title {

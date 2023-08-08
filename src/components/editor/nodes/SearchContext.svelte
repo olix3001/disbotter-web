@@ -196,7 +196,7 @@
         align-items: flex-start;
         border-radius: 5px;
         background-color: #323232;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.2rem;
         cursor: pointer;
     }
 

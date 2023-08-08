@@ -12,7 +12,9 @@ export interface NodeType {
 	action: (node: Node, inputs: NodeIO) => NodeIO;
 }
 
-export type NodeIOType = { [key: string]: { type: string; name: string; struct?: StructureType } };
+export type NodeIOType = {
+	[key: string]: { type: NodeConnectionType; name: string; struct?: StructureType };
+};
 export type NodeIO = { [key: string]: any };
 
 export interface StructureType {
@@ -26,6 +28,23 @@ export enum NodeConnectionType {
 	Boolean,
 	Structure,
 	Any
+}
+
+export function getNodeConnectionTypeColor(type: NodeConnectionType) {
+	switch (type) {
+		case NodeConnectionType.Flow:
+			return '#ffffff'; // White
+		case NodeConnectionType.Number:
+			return '#2f904b'; // Green
+		case NodeConnectionType.Text:
+			return '#eeab2c'; // Orange
+		case NodeConnectionType.Boolean:
+			return '#ee5339'; // Red
+		case NodeConnectionType.Structure:
+			return '#427ade'; // Blue
+		case NodeConnectionType.Any:
+			return '#8338f9'; // Purple
+	}
 }
 
 export interface ENode {
