@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { NodeType } from "$lib/editor/node";
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
-	import { getContext, onDestroy } from "svelte";
+	import { getContext, onDestroy, createEventDispatcher } from "svelte";
     import { fade } from "svelte/transition";
 
     let position: { x: number; y: number } = { x: 0, y: 0 };
@@ -10,6 +10,10 @@
     let inputField: HTMLInputElement;
 
     let search = "";
+    const dispatch = createEventDispatcher<{ nodeselected: {
+        node: NodeType;
+        position: { x: number; y: number };
+    } }>();
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     let categorizedNodes: { [key: string]: NodeType[] } = {};
@@ -47,11 +51,20 @@
         open = false;
     };
 
+    let contextMenu: HTMLDivElement;
+    function closeContextCheck(e: MouseEvent) {
+        // Check if the click was outside the context
+        if (open && e.target !== contextMenu && !contextMenu.contains(e.target as Node)) {
+            closeContext();
+        }
+    }
+
 </script>
 
 {#if open}
     <div 
         class="editor-context-search"
+        bind:this={contextMenu}
         style={positionCSS} 
         transition:fade={{
             duration: 150
@@ -75,8 +88,16 @@
                 <div class="ec-category">
                     <div class="ec-category-title">{category}</div>
                     <div class="ec-category-body">
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
                         {#each filteredSearch[category] as node}
-                            <div class="ec-node">
+                            <div class="ec-node" on:click={() => {
+                                dispatch('nodeselected', {
+                                    node,
+                                    position
+                                });
+                                closeContext();
+                            }}>
                                 <div class="ec-node-title">{node.title}</div>
                                 <div class="ec-node-description">{node.description}</div>
                             </div>
@@ -87,6 +108,8 @@
         </div>
     </div>
 {/if}
+
+<svelte:body on:click={closeContextCheck} />
 
 <style>
     .editor-context-search {

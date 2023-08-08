@@ -1,15 +1,31 @@
 <script lang="ts">
 	import type { ENode } from "$lib/editor/node";
+	import { getContext, onDestroy } from "svelte";
+	import type { Writable } from "svelte/store";
 
     export let node: ENode;
     export let currentZoom: number;
 
     let dragging = false;
+    const selectedNodes = getContext<Writable<ENode[]>>("selectedNodes");
+    let isSelected = false;
     $: offsetCSS = `transform: translate(${node.x}px, ${node.y}px)`;
+
+    const unsubscribeSelectedNodes = selectedNodes.subscribe((nodes) => {
+        isSelected = nodes.includes(node);
+    });
+
+    onDestroy(() => {
+        selectedNodes.update((nodes) => {
+            return nodes.filter((n) => n !== node);
+        });
+        unsubscribeSelectedNodes();
+    });
 
     function startDrag(e: MouseEvent) {
         if (e.button == 0) {
             dragging = true;
+            selectNode();
         }
     }
     function stopDrag(e: MouseEvent) {
@@ -23,15 +39,18 @@
             node.y += e.movementY * (1 / currentZoom);
         }
     }
+
+    function selectNode() {
+        $selectedNodes = [node]
+    }
 </script>
 
-<div class="node-view" style={offsetCSS}>
+<div class="node-view" style={offsetCSS} class:nv-selected={isSelected}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div 
         class="node-view-header"
         on:mousedown={startDrag}
-        on:mouseup={stopDrag}
-        on:mousemove={moveNode}
         >
         <!-- If node has __flow_in__ then it should be there -->
         {#if node.type.inputs.__flow_in__}
@@ -55,6 +74,8 @@
     </div>
 </div>
 
+<svelte:body on:mousemove={moveNode} on:mouseup={stopDrag} />
+
 <style>
     .node-view {
         display: flex;
@@ -64,7 +85,8 @@
         font-size: small;
         border-radius: 10px;
         overflow: hidden;
-        position: relative;
+        position: absolute;
+        min-width: 130px;
     }
 
     .node-view-header {
@@ -96,5 +118,9 @@
         font-size: 0.1em;
         word-wrap: break-word;
         margin-top: 2px;
+    }
+
+    .nv-selected {
+        border: 2px dashed #7f7f7f;
     }
 </style>

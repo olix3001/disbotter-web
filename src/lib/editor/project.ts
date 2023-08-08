@@ -1,5 +1,5 @@
 import type { Writable } from 'svelte/store';
-import type { NodeFlow, NodeIO } from './node';
+import type { ENode, NodeFlow, NodeIO } from './node';
 import { v4 as uuidv4 } from 'uuid';
 
 export const projectKey = Symbol('disbotter project');
@@ -26,6 +26,22 @@ export class DisbotterProject {
 		}
 
 		return null;
+	}
+
+	public addNode(node: ENode): void {
+		if (this.currentlyEditing?.type === 'command') {
+			this.currentlyEditing.command?.flow.nodes.push(node);
+		}
+	}
+
+	public removeNodes(nodes: ENode[]): void {
+		if (this.currentlyEditing?.type === 'command') {
+			if (this.currentlyEditing.command) {
+				this.currentlyEditing.command.flow.nodes = this.currentlyEditing.command.flow.nodes.filter(
+					(node) => !nodes.includes(node)
+				);
+			}
+		}
 	}
 }
 

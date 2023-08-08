@@ -21,16 +21,17 @@
 
 <style>
     .header {
-        background-color: #060606;
+        background-color: #070808;
         display: flex;
         align-items: center;
         padding: .3em;
         cursor: pointer;
     }
     .header:hover {
-        background-color: #0f0f0f;
+        background-color: #030303;
     }
     .body {
-        background-color: #1f1f1f;
+        background-color: #0f0f0f;
+        box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
     }
 </style>

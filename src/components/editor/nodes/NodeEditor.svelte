@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
-	import { getContext } from "svelte";
+	import { getContext, setContext } from "svelte";
 	import NodeView from "./NodeView.svelte";
 	import SearchContext from "./SearchContext.svelte";
+	import type { NodeType } from "$lib/editor/node";
+	import { writable } from "svelte/store";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     type Vec2 = { x: number, y: number };
@@ -16,6 +18,8 @@
     let EDITOR_CONTENT: HTMLDivElement;
 
     let dragging = false;
+
+    const selectedNodes = setContext("selectedNodes", writable([]))
     
     function zoomEditor(event: WheelEvent) {
         const zoomAmount = event.deltaY * -0.001;
@@ -66,9 +70,37 @@
 
         openContext({ x, y });
     }
-    function closeContextMenu(e: MouseEvent) {
-        if (e.button !== 2) {
-            closeContext();
+
+    function insertNode(e: { detail: {node: NodeType, position: { x: number, y: number }} }) {
+        const { node, position } = e.detail;
+
+        // Calculate position to insert node at
+        const x = (position.x - editorOffset.x) / editorZoom;
+        const y = (position.y - editorOffset.y) / editorZoom;
+
+        PROJECT.update(project => {
+            project.addNode(
+                {
+                    type: node,
+                    x: x,
+                    y: y,
+                    inputs: {},
+                    outputs: {},
+                    // TODO: Add default hardcoded values
+                    inputHardcoded: {},
+                    outputHardcoded: {},
+                }
+            )
+            return project;
+        });
+    }
+
+    function keypress(e: KeyboardEvent) {
+        if (e.key === "Delete") {
+            PROJECT.update(project => {
+                project.removeNodes($selectedNodes);
+                return project;
+            });
         }
     }
 </script>
@@ -84,11 +116,10 @@
         class="editor"
         bind:this={EDITOR}
         on:contextmenu|preventDefault|stopPropagation={openContextMenu}
-        on:mousedown={closeContextMenu}
+        on:wheel|preventDefault={zoomEditor}
         >
         <svg 
             class="editor-background"
-            on:wheel|preventDefault={zoomEditor}
             on:mousedown={startDragging}
             on:mouseup={endDragging}
             on:mousemove|preventDefault={moveEditor}
@@ -102,22 +133,15 @@
         </svg>
 
         <div class="editor-content" bind:this={EDITOR_CONTENT} style={transformCSS}>
-            <NodeView node={{
-                id: 'onCommand',
-                type: $PROJECT.commands[0].flow.availableNodes[0],
-
-                x: 0,
-                y: 0,
-
-                inputs: {},
-                outputs: {},
-                inputHardcoded: {},
-                outputHardcoded: {},
-            }} currentZoom={editorZoom}/>
+            {#each $PROJECT.getCurrentFlow()?.nodes ?? [] as node}
+                <NodeView node={node} currentZoom={editorZoom} />
+            {/each}
         </div>
-        <SearchContext bind:openContext bind:closeContext />
+        <SearchContext bind:openContext bind:closeContext on:nodeselected={insertNode} />
      </div>
 {/if}
+
+<svelte:document on:keydown={keypress} />
 
 <style>
     .not-editing {

@@ -29,7 +29,6 @@ export enum NodeConnectionType {
 }
 
 export interface ENode {
-	id: string;
 	type: NodeType;
 	x: number;
 	y: number;
