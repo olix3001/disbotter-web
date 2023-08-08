@@ -1,5 +1,11 @@
 import type { Writable } from 'svelte/store';
-import { NodeConnectionType, type ENode, type NodeFlow, type NodeIO } from './node';
+import {
+	NodeConnectionType,
+	type ENode,
+	type NodeFlow,
+	type NodeIO,
+	type NodeConnection
+} from './node';
 import { v4 as uuidv4 } from 'uuid';
 
 export const projectKey = Symbol('disbotter project');
@@ -10,6 +16,8 @@ export class DisbotterProject {
 
 	public commands: Command[] = [];
 	public currentlyEditing: { type: 'command'; command?: Command } | null = null;
+
+	public currentConnection: NodeConnection | null = null;
 
 	constructor(name: string) {
 		this.name = name;
@@ -84,9 +92,9 @@ const commandAvailableNodes: any = [
 				type: NodeConnectionType.Flow,
 				name: 'Flow'
 			},
-			interaction: {
+			target: {
 				type: NodeConnectionType.Structure,
-				name: 'Interaction',
+				name: 'Target',
 				struct: {}
 			}
 		},
@@ -94,6 +102,91 @@ const commandAvailableNodes: any = [
 			__flow_out__: {
 				type: NodeConnectionType.Flow,
 				name: 'Flow'
+			}
+		},
+
+		action: (node: Node, inputs: NodeIO): NodeIO => {
+			return {};
+		}
+	},
+	{
+		id: 'Test',
+		title: 'IO Test',
+		description: 'Contains all the IO types',
+		category: 'Development',
+		color: '#e91e63',
+		icon: '/icons/editor/trigger.png',
+
+		inputs: {
+			__flow_in__: {
+				type: NodeConnectionType.Flow,
+				name: 'Flow'
+			},
+			number: {
+				type: NodeConnectionType.Number,
+				name: 'Number'
+			},
+			text: {
+				type: NodeConnectionType.Text,
+				name: 'Text'
+			},
+			boolean: {
+				type: NodeConnectionType.Boolean,
+				name: 'Boolean'
+			},
+			structure: {
+				type: NodeConnectionType.Structure,
+				name: 'Structure',
+				struct: {
+					foo: {
+						type: NodeConnectionType.Text,
+						name: 'Foo'
+					},
+					bar: {
+						type: NodeConnectionType.Number,
+						name: 'Bar'
+					}
+				}
+			},
+			any: {
+				type: NodeConnectionType.Any,
+				name: 'Any'
+			}
+		},
+		outputs: {
+			__flow_out__: {
+				type: NodeConnectionType.Flow,
+				name: 'Flow'
+			},
+			number: {
+				type: NodeConnectionType.Number,
+				name: 'Number'
+			},
+			text: {
+				type: NodeConnectionType.Text,
+				name: 'Text'
+			},
+			boolean: {
+				type: NodeConnectionType.Boolean,
+				name: 'Boolean'
+			},
+			structure: {
+				type: NodeConnectionType.Structure,
+				name: 'Structure',
+				struct: {
+					foo: {
+						type: NodeConnectionType.Text,
+						name: 'Foo'
+					},
+					bar: {
+						type: NodeConnectionType.Number,
+						name: 'Bar'
+					}
+				}
+			},
+			any: {
+				type: NodeConnectionType.Any,
+				name: 'Any'
 			}
 		},
 

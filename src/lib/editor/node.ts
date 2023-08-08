@@ -52,6 +52,9 @@ export interface ENode {
 	x: number;
 	y: number;
 
+	iPorts: { [key: string]: SVGSVGElement };
+	oPorts: { [key: string]: SVGSVGElement };
+
 	inputs: { [key: string]: NodeConnection };
 	outputs: { [key: string]: NodeConnection };
 
@@ -63,15 +66,11 @@ export interface ENode {
 
 export interface NodeConnection {
 	type: NodeConnectionType;
-	value: any;
 
 	from: ENode;
-	to: ENode;
-
-	start?: HTMLElement;
-	end?: HTMLElement;
-
-	self?: HTMLElement;
+	fromKey: string;
+	to: ENode | null;
+	toKey: string | null;
 }
 
 export interface NodeFlow {

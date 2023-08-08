@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ENode } from "$lib/editor/node";
+	import { NodeConnectionType, type ENode } from "$lib/editor/node";
 	import { getContext, onDestroy } from "svelte";
 	import type { Writable } from "svelte/store";
 	import NodeConnector from "./NodeConnector.svelte";
@@ -55,17 +55,29 @@
         >
         <!-- If node has __flow_in__ then it should be there -->
         {#if node.type.inputs.__flow_in__}
-            <NodeConnector color="white" style="double" />
+            <NodeConnector 
+                color="white" 
+                style="double" 
+                bind:port={node.iPorts["__flow_in__"]} 
+                node={node}
+                key="__flow_in__"
+                />
         {/if}
 
-        <div class="nvh-info">
+        <div class="nvh-info" class:nvh-center={node.type.inputs.__flow_in__ && node.type.outputs.__flow_out__}>
             <p class="nvh-title">{node.type.title}</p>
             <p class="nvh-desc">{node.type.description}</p>
         </div>
 
         <!-- If node has __flow_out__ then it should be there -->
         {#if node.type.outputs.__flow_out__}
-            <NodeConnector color="white" style="double" />
+            <NodeConnector 
+                color="white" 
+                style="double" 
+                bind:port={node.oPorts["__flow_out__"]} 
+                node={node}
+                key="__flow_out__"
+                />
         {/if}
     </div>
     <div class="node-view-body">
@@ -73,8 +85,23 @@
             {#each Object.entries(node.type.inputs) as input}
                 {#if input[0] !== "__flow_in__"}
                     <div class="nf-block nf-i">
-                        <NodeConnector type={input[1].type} />
-                        <p>{input[0]}</p>
+                        <NodeConnector 
+                            type={input[1].type} 
+                            bind:port={node.iPorts[input[1].name]} 
+                            node={node}
+                            key={input[1].name}
+                            />
+                        {#if input[1].type === NodeConnectionType.Number}
+                            <input type="number" placeholder={input[1].name} />
+                        {:else if input[1].type === NodeConnectionType.Text}
+                            <input type="text" placeholder={input[1].name} />
+                        {:else if input[1].type === NodeConnectionType.Boolean}
+                            <input type="checkbox" />
+                            <!-- svelte-ignore a11y-label-has-associated-control -->
+                            <label>{input[1].name}</label>
+                        {:else}
+                             <p>{input[1].name}</p>
+                        {/if}
                     </div>
                 {/if}
             {/each}
@@ -84,7 +111,12 @@
                 {#if output[0] !== "__flow_out__"}
                     <div class="nf-block nf-o">
                         <p>{output[0]}</p>
-                        <NodeConnector type={output[1].type} />
+                        <NodeConnector 
+                            type={output[1].type} 
+                            bind:port={node.oPorts[output[1].name]} 
+                            node={node}
+                            key={output[1].name}
+                            />
                     </div>
                 {/if}
             {/each}
@@ -144,9 +176,61 @@
 
     .nf-i {
         justify-content: flex-start;
+        height: 1em;
     }
+
+    .nf-i > input {
+        background-color: #0f0f0f;
+        border: none;
+        padding: 0.5em;
+        padding-left: 0.8em;
+        border-radius: 10px;
+        color: #c0c0c0;
+        font-weight: 500;
+        font-size: xx-small;
+        text-align: center;
+        width: 4rem;
+    }
+
+    .nf-i > input[type="checkbox"] {
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 5px;
+        border: 2px solid #0f0f0f;
+        background-color: #0f0f0f;
+        padding: 0;
+        margin-right: 0.5em;
+        outline: 1px solid #3f3f3f;
+    }
+
+    .nf-i > input[type="checkbox"]:checked {
+        background-color: #3f3f3f;
+    }
+
+    .nf-i > label {
+        color: #c0c0c0;
+        font-weight: 500;
+        font-size: xx-small;
+    }
+
+    .nf-i > input[type="text"] {
+        width: 6rem;
+        text-align: start;
+    }
+
+    .nf-i > input:focus {
+        outline: 1px solid #3f3f3f;
+    }
+
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
     .nf-o {
         justify-content: flex-end;
+        height: 1em;
     }
 
     .nf-block > p {
@@ -161,6 +245,17 @@
         justify-content: space-between;
         padding: 0.1em;
         padding-bottom: 0.3em;
+    }
+
+    .nvh-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .nvh-center {
+        justify-content: center !important;
+        align-items: center !important;
     }
 
     .nvh-title {

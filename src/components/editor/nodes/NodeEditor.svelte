@@ -84,6 +84,8 @@
                     type: node,
                     x: x,
                     y: y,
+                    iPorts: {},
+                    oPorts: {},
                     inputs: {},
                     outputs: {},
                     // TODO: Add default hardcoded values
@@ -133,6 +135,8 @@
         </svg>
 
         <div class="editor-content" bind:this={EDITOR_CONTENT} style={transformCSS}>
+            <svg class="editor-connections">
+            </svg>
             {#each $PROJECT.getCurrentFlow()?.nodes ?? [] as node}
                 <NodeView node={node} currentZoom={editorZoom} />
             {/each}
@@ -179,6 +183,15 @@
         position: absolute;
         top: 0;
         left: 0;
+    }
+
+    .editor-connections {
+        z-index: 1000;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: visible;
+        pointer-events: none;
     }
 
     .editor-content {
