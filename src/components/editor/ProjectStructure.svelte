@@ -11,6 +11,13 @@
             return p;
         });
     }
+
+    function setEditing(command: Command) {
+        PROJECT.update(p => {
+            p.setEditing(command);
+            return p;
+        });
+    }
 </script>
 
 <Collapse open={true}>
@@ -19,8 +26,10 @@
         <button on:click|stopPropagation={addCommand}>New</button>
     </div>
     <div>
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         {#each $PROJECT.commands as command (command.uid)}
-             <div>
+             <!-- svelte-ignore a11y-click-events-have-key-events -->
+             <div class="element" class:selected={$PROJECT.isEditing(command)} on:click={() => setEditing(command)}>
                 <p>{command.name}</p>
                 <p>{command.description}</p>
              </div>
@@ -53,4 +62,21 @@
         padding: .3em;
         cursor: pointer;
     }
+
+    .element {
+        cursor: pointer;
+    }
+
+    .element:hover {
+        background-color: #060606;
+    }
+
+    .selected {
+        background-color: #427ade;
+    }
+
+    .selected:hover {
+        background-color: #427bef;
+    }
+
 </style>

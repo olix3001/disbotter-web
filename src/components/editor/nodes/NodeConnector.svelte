@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { NodeConnectionType, getNodeConnectionTypeColor, type ENode, type StructureType, compareStructureType } from "$lib/editor/node";
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
-	import { getContext } from "svelte";
+	import { getContext, onDestroy, onMount } from "svelte";
 
     export let isEndPort: boolean = false;
     export let node: ENode;
@@ -13,7 +13,7 @@
     export let port: SVGSVGElement;
 
     const PROJECT = getContext<ProjectContext>(projectKey);
-
+        
     function startDrag(e: MouseEvent) {
         if (e.button == 0) {
             PROJECT.update((p) => {

@@ -6,6 +6,7 @@
 	import type { NodeType } from "$lib/editor/node";
 	import { writable } from "svelte/store";
 	import FlowConnection from "./FlowConnection.svelte";
+    import { v4 as uuidv4 } from "uuid";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     type Vec2 = { x: number, y: number };
@@ -90,6 +91,7 @@
         PROJECT.update(project => {
             project.addNode(
                 {
+                    uid: uuidv4(),
                     type: node,
                     x: x,
                     y: y,
@@ -151,7 +153,7 @@
                     <FlowConnection connection={conn} editor={EDITOR_CONTENT} editorZoom={editorZoom}/>
                 {/each}
             </svg>
-            {#each $PROJECT.getCurrentFlow()?.nodes ?? [] as node}
+            {#each $PROJECT.getCurrentFlow()?.nodes ?? [] as node (node.uid)}
                 <NodeView node={node} currentZoom={editorZoom} />
             {/each}
         </div>

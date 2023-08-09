@@ -105,6 +105,16 @@ export class DisbotterProject {
 			}
 		}
 	}
+
+	public isEditing(target: Command): boolean {
+		return this.currentlyEditing?.type === 'command' && this.currentlyEditing.command === target;
+	}
+
+	public setEditing(target: Command): void {
+		if (target instanceof Command) {
+			this.currentlyEditing = { type: 'command', command: target };
+		}
+	}
 }
 
 const commandAvailableNodes: any = [

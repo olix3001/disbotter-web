@@ -59,6 +59,8 @@ export function getNodeConnectionTypeColor(type: NodeConnectionType) {
 }
 
 export interface ENode {
+	uid: string;
+
 	type: NodeType;
 	x: number;
 	y: number;

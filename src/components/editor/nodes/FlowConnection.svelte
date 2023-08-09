@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getNodeConnectionTypeColor, type NodeConnection } from "$lib/editor/node";
+	import { beforeUpdate, onMount } from "svelte";
 
     export let connection: NodeConnection;
     export let editor: HTMLDivElement;
@@ -54,8 +55,18 @@
 
     let dynamicConnectionPath = '';
     $: color = getNodeConnectionTypeColor(connection.type);
-    $: pathCode = isCurrent ? dynamicConnectionPath : calculateConnectionPath(connection);
+    let pathCode = '';
+    $: finalPathCode = isCurrent ? dynamicConnectionPath : pathCode;
+
+    beforeUpdate(async () => {
+        pathCode =  await calculateConnectionPath(connection);
+    });
+
+    onMount(async () => {
+        pathCode = await calculateConnectionPath(connection);
+    });
+
 </script>
 
-<path d={pathCode} fill="transparent" stroke={color} stroke-width="2"></path>
+<path d={finalPathCode} fill="transparent" stroke={color} stroke-width="2"></path>
 <svelte:body on:mousemove={calculateDynamicConnectionPath} />
