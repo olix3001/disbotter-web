@@ -3,9 +3,12 @@
 	import { getContext, onDestroy } from "svelte";
 	import type { Writable } from "svelte/store";
 	import NodeConnector from "./NodeConnector.svelte";
+	import { projectKey, type ProjectContext } from "$lib/editor/project";
 
     export let node: ENode;
     export let currentZoom: number;
+
+    const PROJECT = getContext<ProjectContext>(projectKey);
 
     let dragging = false;
     const selectedNodes = getContext<Writable<ENode[]>>("selectedNodes");
@@ -38,6 +41,7 @@
         if (e.buttons === 1 && dragging) {
             node.x += e.movementX * (1 / currentZoom);
             node.y += e.movementY * (1 / currentZoom);
+            PROJECT.update((p) => p);
         }
     }
 
@@ -58,9 +62,11 @@
             <NodeConnector 
                 color="white" 
                 style="double" 
+                type={NodeConnectionType.Flow}
                 bind:port={node.iPorts["__flow_in__"]} 
                 node={node}
                 key="__flow_in__"
+                isEndPort
                 />
         {/if}
 
@@ -74,6 +80,7 @@
             <NodeConnector 
                 color="white" 
                 style="double" 
+                type={NodeConnectionType.Flow}
                 bind:port={node.oPorts["__flow_out__"]} 
                 node={node}
                 key="__flow_out__"
@@ -90,6 +97,8 @@
                             bind:port={node.iPorts[input[1].name]} 
                             node={node}
                             key={input[1].name}
+                            sType={input[1].struct}
+                            isEndPort
                             />
                         {#if input[1].type === NodeConnectionType.Number}
                             <input type="number" placeholder={input[1].name} />
@@ -116,6 +125,7 @@
                             bind:port={node.oPorts[output[1].name]} 
                             node={node}
                             key={output[1].name}
+                            sType={output[1].struct}
                             />
                     </div>
                 {/if}

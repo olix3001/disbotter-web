@@ -21,6 +21,17 @@ export interface StructureType {
 	[key: string]: NodeConnectionType;
 }
 
+export function compareStructureType(a: StructureType, b: StructureType) {
+	if (Object.keys(a).length !== Object.keys(b).length) return false;
+
+	for (const key in a) {
+		if (!(key in b)) return false;
+		if (a[key] !== b[key]) return false;
+	}
+
+	return true;
+}
+
 export enum NodeConnectionType {
 	Flow,
 	Number,
@@ -66,9 +77,10 @@ export interface ENode {
 
 export interface NodeConnection {
 	type: NodeConnectionType;
+	sType?: StructureType;
 
-	from: ENode;
-	fromKey: string;
+	from: ENode | null;
+	fromKey: string | null;
 	to: ENode | null;
 	toKey: string | null;
 }

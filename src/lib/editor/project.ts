@@ -36,6 +36,30 @@ export class DisbotterProject {
 		return null;
 	}
 
+	public createConnection(conn: NodeConnection): void {
+		const flow = this.getCurrentFlow();
+
+		if (flow) {
+			// Check if the connection already exists
+			const existingConnection = flow.connections.find((c) => {
+				return (
+					c.from === conn.from &&
+					c.fromKey === conn.fromKey &&
+					c.to === conn.to &&
+					c.toKey === conn.toKey
+				);
+			});
+
+			if (existingConnection) {
+				// Break the connection
+				flow.connections = flow.connections.filter((c) => c !== existingConnection);
+			} else {
+				// Create the connection
+				flow.connections.push(conn);
+			}
+		}
+	}
+
 	public addNode(node: ENode): void {
 		if (this.currentlyEditing?.type === 'command') {
 			this.currentlyEditing.command?.flow.nodes.push(node);
@@ -45,9 +69,23 @@ export class DisbotterProject {
 	public removeNodes(nodes: ENode[]): void {
 		if (this.currentlyEditing?.type === 'command') {
 			if (this.currentlyEditing.command) {
+				for (const node of nodes) {
+					this.removeRelatedConnections(node);
+				}
 				this.currentlyEditing.command.flow.nodes = this.currentlyEditing.command.flow.nodes.filter(
 					(node) => !nodes.includes(node)
 				);
+			}
+		}
+	}
+
+	public removeRelatedConnections(node: ENode): void {
+		if (this.currentlyEditing?.type === 'command') {
+			if (this.currentlyEditing.command) {
+				this.currentlyEditing.command.flow.connections =
+					this.currentlyEditing.command.flow.connections.filter(
+						(conn) => conn.from !== node && conn.to !== node
+					);
 			}
 		}
 	}

@@ -5,6 +5,7 @@
 	import SearchContext from "./SearchContext.svelte";
 	import type { NodeType } from "$lib/editor/node";
 	import { writable } from "svelte/store";
+	import FlowConnection from "./FlowConnection.svelte";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
     type Vec2 = { x: number, y: number };
@@ -136,6 +137,9 @@
 
         <div class="editor-content" bind:this={EDITOR_CONTENT} style={transformCSS}>
             <svg class="editor-connections">
+                {#each $PROJECT.getCurrentFlow()?.connections ?? [] as conn}
+                    <FlowConnection connection={conn} editor={EDITOR_CONTENT} editorZoom={editorZoom}/>
+                {/each}
             </svg>
             {#each $PROJECT.getCurrentFlow()?.nodes ?? [] as node}
                 <NodeView node={node} currentZoom={editorZoom} />
