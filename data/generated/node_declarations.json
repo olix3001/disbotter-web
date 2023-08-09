@@ -1,0 +1,28 @@
+[
+  {
+    "id": "onCommand",
+    "title": "On Command",
+    "description": "Triggered when a command is executed.",
+    "category": "Events",
+    "color": "default",
+    "icon": "/icons/editor/trigger.png",
+    "inputs": {},
+    "outputs": {
+      "interaction": {
+        "type": {
+          "type": "Structure",
+          "struct_type": "discord_interaction"
+        },
+        "name": "Interaction"
+      },
+      "__flow_out__": {
+        "type": {
+          "type": "Flow",
+          "struct_type": ""
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  }
+]
