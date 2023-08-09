@@ -53,11 +53,19 @@
     function startDragging(e: MouseEvent) {
         if (e.button == 0) {
             dragging = true;
+            // Unselect all nodes
+            selectedNodes.set([]);
         }
     }
     function endDragging(e: MouseEvent) {
         if (e.button == 0) {
             dragging = false;
+            if ($PROJECT.currentConnection) {
+                PROJECT.update(p => {
+                    p.currentConnection = null;
+                    return p;
+                });
+            }
         }
     }
 
@@ -87,8 +95,6 @@
                     y: y,
                     iPorts: {},
                     oPorts: {},
-                    inputs: {},
-                    outputs: {},
                     // TODO: Add default hardcoded values
                     inputHardcoded: {},
                     outputHardcoded: {},
@@ -137,6 +143,10 @@
 
         <div class="editor-content" bind:this={EDITOR_CONTENT} style={transformCSS}>
             <svg class="editor-connections">
+                {#if $PROJECT.currentConnection !== null}
+                    <!-- Current Connection -->
+                    <FlowConnection connection={$PROJECT.currentConnection} editor={EDITOR_CONTENT} editorZoom={editorZoom} isCurrent={true}/>
+                {/if}
                 {#each $PROJECT.getCurrentFlow()?.connections ?? [] as conn}
                     <FlowConnection connection={conn} editor={EDITOR_CONTENT} editorZoom={editorZoom}/>
                 {/each}

@@ -54,7 +54,23 @@ export class DisbotterProject {
 				// Break the connection
 				flow.connections = flow.connections.filter((c) => c !== existingConnection);
 			} else {
-				// Create the connection
+				// Safety checks
+				// 1: Check if connection does not connect to itself
+				if (conn.from === conn.to) return;
+
+				// 2: Check if this input is not already connected
+				flow.connections = flow.connections.filter(
+					(c) => !(c.to === conn.to && c.toKey === conn.toKey)
+				);
+
+				// 3: Check if flow output does not connect to anything else
+				if (conn.type === NodeConnectionType.Flow) {
+					flow.connections = flow.connections.filter(
+						(c) => !(c.from === conn.from && c.fromKey === conn.fromKey)
+					);
+				}
+
+				// Add the connection
 				flow.connections.push(conn);
 			}
 		}

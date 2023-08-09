@@ -41,10 +41,18 @@
         if (e.button == 0) {
             const cc = $PROJECT.currentConnection;
             
-            if (cc?.type !== type && cc?.type !== NodeConnectionType.Any) return;
-            if (cc?.type == NodeConnectionType.Structure && !compareStructureType(cc?.sType ?? {}, sType)) return;
+            if (
+                (cc?.type !== type && cc?.type !== NodeConnectionType.Any) ||
+                cc?.type == NodeConnectionType.Structure && !compareStructureType(cc?.sType ?? {}, sType)
+            ) {
+                PROJECT.update((p) => {
+                    p.currentConnection = null;
+                    return p;
+                });
+                return;
+            }
 
-            if (cc?.from && cc?.fromKey) {
+            if (cc?.from && cc?.fromKey && isEndPort) {
                 PROJECT.update((p) => {
                     p.currentConnection = null;
                     p.createConnection({
@@ -56,7 +64,7 @@
                     });
                     return p;
                 });
-            } else if (cc?.to && cc?.toKey) {
+            } else if (cc?.to && cc?.toKey && !isEndPort) {
                 PROJECT.update((p) => {
                     p.currentConnection = null;
                     p.createConnection({
@@ -66,6 +74,11 @@
                         to: cc.to,
                         toKey: cc.toKey,
                     });
+                    return p;
+                });
+            } else {
+                PROJECT.update((p) => {
+                    p.currentConnection = null;
                     return p;
                 });
             }

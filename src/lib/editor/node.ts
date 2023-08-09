@@ -66,9 +66,6 @@ export interface ENode {
 	iPorts: { [key: string]: SVGSVGElement };
 	oPorts: { [key: string]: SVGSVGElement };
 
-	inputs: { [key: string]: NodeConnection };
-	outputs: { [key: string]: NodeConnection };
-
 	inputHardcoded: { [key: string]: any };
 	outputHardcoded: { [key: string]: any };
 
