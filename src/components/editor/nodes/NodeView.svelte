@@ -35,6 +35,9 @@
     function stopDrag(e: MouseEvent) {
         if (e.button == 0) {
             dragging = false;
+            if ($PROJECT.currentConnection) {
+                $PROJECT.currentConnection = null;
+            }
         }
     }
     function moveNode(e: MouseEvent) {
@@ -94,18 +97,19 @@
                     <div class="nf-block nf-i">
                         <NodeConnector 
                             type={input[1].type} 
-                            bind:port={node.iPorts[input[1].name]} 
+                            bind:port={node.iPorts[input[0]]} 
                             node={node}
-                            key={input[1].name}
+                            key={input[0]}
                             sType={input[1].struct}
                             isEndPort
                             />
+                        <!-- TODO: Don't show inputs if connected -->
                         {#if input[1].type === NodeConnectionType.Number}
-                            <input type="number" placeholder={input[1].name} />
+                            <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
                         {:else if input[1].type === NodeConnectionType.Text}
-                            <input type="text" placeholder={input[1].name} />
+                            <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
                         {:else if input[1].type === NodeConnectionType.Boolean}
-                            <input type="checkbox" />
+                            <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
                             <!-- svelte-ignore a11y-label-has-associated-control -->
                             <label>{input[1].name}</label>
                         {:else}

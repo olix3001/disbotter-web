@@ -190,6 +190,10 @@ const commandAvailableNodes: any = [
 				type: NodeConnectionType.Number,
 				name: 'Number'
 			},
+			hardcoded: {
+				type: NodeConnectionType.Number,
+				name: 'Hardcoded'
+			},
 			text: {
 				type: NodeConnectionType.Text,
 				name: 'Text'
@@ -252,6 +256,10 @@ const commandAvailableNodes: any = [
 				type: NodeConnectionType.Any,
 				name: 'Any'
 			}
+		},
+
+		defaultHardcoded: {
+			hardcoded: 420
 		},
 
 		action: (node: Node, inputs: NodeIO): NodeIO => {

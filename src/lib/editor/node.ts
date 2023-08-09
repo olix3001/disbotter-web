@@ -9,6 +9,8 @@ export interface NodeType {
 	inputs: NodeIOType;
 	outputs: NodeIOType;
 
+	defaultHardcoded?: NodeIO;
+
 	action: (node: Node, inputs: NodeIO) => NodeIO;
 }
 
@@ -69,7 +71,6 @@ export interface ENode {
 	oPorts: { [key: string]: SVGSVGElement };
 
 	inputHardcoded: { [key: string]: any };
-	outputHardcoded: { [key: string]: any };
 
 	self?: HTMLElement;
 }

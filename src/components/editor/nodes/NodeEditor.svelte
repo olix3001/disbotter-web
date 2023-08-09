@@ -97,9 +97,7 @@
                     y: y,
                     iPorts: {},
                     oPorts: {},
-                    // TODO: Add default hardcoded values
-                    inputHardcoded: {},
-                    outputHardcoded: {},
+                    inputHardcoded: node.defaultHardcoded ?? {},
                 }
             )
             return project;
