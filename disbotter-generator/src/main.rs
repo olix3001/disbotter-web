@@ -5,5 +5,5 @@ pub mod builder;
 
 fn main() {
     let nodes = load_all_nodes("../data/nodes".into());
-    export_node_declarations(nodes, "../data/generated/node_declarations.json".into());
+    export_node_declarations(nodes, "../static/generated/node_declarations.json".into());
 }

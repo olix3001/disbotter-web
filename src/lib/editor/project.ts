@@ -4,9 +4,11 @@ import {
 	type ENode,
 	type NodeFlow,
 	type NodeIO,
-	type NodeConnection
+	type NodeConnection,
+	type NodeType
 } from './node';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 
 export const projectKey = Symbol('disbotter project');
 
@@ -117,156 +119,19 @@ export class DisbotterProject {
 	}
 }
 
-const commandAvailableNodes: any = [
-	{
-		id: 'onCommand',
-		title: 'On Command',
-		description: 'Triggered when a command is executed',
-		category: 'Events',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
+export async function loadNodeDeclarations(file: string): Promise<NodeType[]> {
+	const nodes = await fetch(file).then((res) => res.json());
+	return nodes;
+}
 
-		inputs: {},
-		outputs: {
-			__flow_out__: {
-				type: NodeConnectionType.Flow,
-				name: 'Flow'
-			},
-			interaction: {
-				type: NodeConnectionType.Structure,
-				name: 'Interaction',
-				struct: {}
-			}
-		},
+let commandAvailableNodes: NodeType[] = [];
 
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	},
-	{
-		id: 'Reply',
-		title: 'Reply',
-		description: 'Replies to the interaction/message',
-		category: 'Actions',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
-
-		inputs: {
-			__flow_in__: {
-				type: NodeConnectionType.Flow,
-				name: 'Flow'
-			},
-			target: {
-				type: NodeConnectionType.Structure,
-				name: 'Target',
-				struct: {}
-			}
-		},
-		outputs: {
-			__flow_out__: {
-				type: NodeConnectionType.Flow,
-				name: 'Flow'
-			}
-		},
-
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	},
-	{
-		id: 'Test',
-		title: 'IO Test',
-		description: 'Contains all the IO types',
-		category: 'Development',
-		color: '#e91e63',
-		icon: '/icons/editor/trigger.png',
-
-		inputs: {
-			__flow_in__: {
-				type: NodeConnectionType.Flow,
-				name: 'Flow'
-			},
-			number: {
-				type: NodeConnectionType.Number,
-				name: 'Number'
-			},
-			hardcoded: {
-				type: NodeConnectionType.Number,
-				name: 'Hardcoded'
-			},
-			text: {
-				type: NodeConnectionType.Text,
-				name: 'Text'
-			},
-			boolean: {
-				type: NodeConnectionType.Boolean,
-				name: 'Boolean'
-			},
-			structure: {
-				type: NodeConnectionType.Structure,
-				name: 'Structure',
-				struct: {
-					foo: {
-						type: NodeConnectionType.Text,
-						name: 'Foo'
-					},
-					bar: {
-						type: NodeConnectionType.Number,
-						name: 'Bar'
-					}
-				}
-			},
-			any: {
-				type: NodeConnectionType.Any,
-				name: 'Any'
-			}
-		},
-		outputs: {
-			__flow_out__: {
-				type: NodeConnectionType.Flow,
-				name: 'Flow'
-			},
-			number: {
-				type: NodeConnectionType.Number,
-				name: 'Number'
-			},
-			text: {
-				type: NodeConnectionType.Text,
-				name: 'Text'
-			},
-			boolean: {
-				type: NodeConnectionType.Boolean,
-				name: 'Boolean'
-			},
-			structure: {
-				type: NodeConnectionType.Structure,
-				name: 'Structure',
-				struct: {
-					foo: {
-						type: NodeConnectionType.Text,
-						name: 'Foo'
-					},
-					bar: {
-						type: NodeConnectionType.Number,
-						name: 'Bar'
-					}
-				}
-			},
-			any: {
-				type: NodeConnectionType.Any,
-				name: 'Any'
-			}
-		},
-
-		defaultHardcoded: {
-			hardcoded: 420
-		},
-
-		action: (node: Node, inputs: NodeIO): NodeIO => {
-			return {};
-		}
-	}
-];
+if (typeof document !== 'undefined') {
+	loadNodeDeclarations('/generated/node_declarations.json').then((nodes) => {
+		commandAvailableNodes = nodes;
+		console.log(commandAvailableNodes);
+	});
+}
 
 export class Command {
 	public uid = uuidv4();

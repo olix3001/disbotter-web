@@ -8,19 +8,19 @@
     "icon": "/icons/editor/trigger.png",
     "inputs": {},
     "outputs": {
-      "interaction": {
-        "type": {
-          "type": "Structure",
-          "struct_type": "discord_interaction"
-        },
-        "name": "Interaction"
-      },
       "__flow_out__": {
         "type": {
-          "type": "Flow",
-          "struct_type": ""
+          "type": 0,
+          "structType": ""
         },
         "name": "flow_out"
+      },
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structType": "discord_interaction"
+        },
+        "name": "Interaction"
       }
     },
     "defaultHardcoded": {}

@@ -157,7 +157,7 @@ pub struct Node {
     pub default_hardcoded: HashMap<String, Dynamic>,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub enum DataType {
     Flow = 0,
     Number = 1,
@@ -168,10 +168,31 @@ pub enum DataType {
     Any = 5,
 }
 
+impl serde::Serialize for DataType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
+        serializer.serialize_u8(*self as u8)
+    }
+}
+
+impl<'a> serde::Deserialize<'a> for DataType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'a> {
+        let value = u8::deserialize(deserializer)?;
+        Ok(match value {
+            0 => DataType::Flow,
+            1 => DataType::Number,
+            2 => DataType::Text,
+            3 => DataType::Boolean,
+            4 => DataType::Structure,
+            _ => DataType::Any,
+        })
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 pub struct NodeIOTy {
     #[serde(rename = "type")]
     ty: DataType,
+    #[serde(rename = "structType")]
     struct_type: String
 }
 

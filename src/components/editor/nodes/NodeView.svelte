@@ -96,19 +96,19 @@
                 {#if input[0] !== "__flow_in__"}
                     <div class="nf-block nf-i">
                         <NodeConnector 
-                            type={input[1].type} 
+                            type={input[1].type.type} 
                             bind:port={node.iPorts[input[0]]} 
                             node={node}
                             key={input[0]}
-                            sType={input[1].struct}
+                            sType={input[1].type.structType}
                             isEndPort
                             />
                         <!-- TODO: Don't show inputs if connected -->
-                        {#if input[1].type === NodeConnectionType.Number}
+                        {#if input[1].type.type === NodeConnectionType.Number}
                             <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
-                        {:else if input[1].type === NodeConnectionType.Text}
+                        {:else if input[1].type.type === NodeConnectionType.Text}
                             <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
-                        {:else if input[1].type === NodeConnectionType.Boolean}
+                        {:else if input[1].type.type === NodeConnectionType.Boolean}
                             <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
                             <!-- svelte-ignore a11y-label-has-associated-control -->
                             <label>{input[1].name}</label>
@@ -125,11 +125,11 @@
                     <div class="nf-block nf-o">
                         <p>{output[0]}</p>
                         <NodeConnector 
-                            type={output[1].type} 
+                            type={output[1].type.type} 
                             bind:port={node.oPorts[output[1].name]} 
                             node={node}
                             key={output[1].name}
-                            sType={output[1].struct}
+                            sType={output[1].type.structType}
                             />
                     </div>
                 {/if}
