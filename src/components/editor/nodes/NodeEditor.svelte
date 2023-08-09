@@ -14,7 +14,7 @@
     let editorOffset: Vec2 = { x: 0, y: 0 };
     $: transformCSS = `transform: translate(${editorOffset.x}px, ${editorOffset.y}px) scale(${editorZoom})`;
     let editorZoom: number = 1;
-    $: PATTERN_SIZE = 5 * editorZoom;
+    $: PATTERN_SIZE = 10 * editorZoom;
     $: PATTERN_SIZE_HALF = PATTERN_SIZE * 0.1;
     let EDITOR: HTMLDivElement;
     let EDITOR_CONTENT: HTMLDivElement;
@@ -27,7 +27,7 @@
         const zoomAmount = event.deltaY * -0.001;
         const zoom = editorZoom + zoomAmount;
 
-        if (zoom > 0.1 && zoom < 5) {
+        if (zoom > 0.5 && zoom < 2) {
             const oldZoom = editorZoom;
             editorZoom = zoom;
 

@@ -2,7 +2,7 @@
     :root {
         --white: #eeeeee;
         --editor-background: #070808;
-        --editor-dots: #1f1f1f;
+        --editor-dots: #2f2f2f;
     }
 
     :root {
