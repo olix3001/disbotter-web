@@ -237,8 +237,8 @@ impl NodesJSCompiler {
         // Clear the var cache
         self.clear_var_cache();
         // Add interaction key
-        self.add_var("interaction".to_string(), "__INTERACTION__".to_string());
-        self.add_var("translations".to_string(), "__TRANSLATIONS__".to_string());
+        self.add_var("___interaction".to_string(), "__INTERACTION__".to_string());
+        self.add_var("___translations".to_string(), "__TRANSLATIONS__".to_string());
 
         // Compile the start node
         self.compile_node(start_node, flow, builder.clone());

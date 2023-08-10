@@ -15,5 +15,5 @@ const outputs = #{
 };
 
 fn action(builder) {
-    builder.bind_io("interaction", "interaction");
+    builder.bind_io("___interaction", "interaction");
 }

@@ -1,38 +1,27 @@
-# create-svelte
+<h1 align="center">DISBOTTER </h1>
+<p align="center">
+    Open-source web editor for Discord bots!
+</p>
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+<p align="center">
+    <img src="./static/example_nodes.png" width="750" style="border-radius: 10px" />
+</p>
 
-## Creating a project
+## About
 
-If you're seeing this, you've probably already done this step. Congrats!
+I made this project because I wanted to create a web node editor, and I thought it would be cool to make it for Discord bots. I also wanted to make it open-source so that people could contribute to it and make it better.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+Currently the project is in a very early stage, and I'm still working on it. I'm planning to add more features and make it better in the future.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Features
 
-## Developing
+- [x] Node editor
+- [x] Save/load projects
+- [x] Generate code from nodes
+- [ ] Connect to backend to automatically generate code
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## How to use (for now)
 
-```bash
-npm run dev
+To generate code from the nodes, you need to save the project and then modify disbotter-generator source code to use the saved project.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+This is temporary, there will be a backend in the future that will automatically generate code from the nodes and CLI tools to compile the code.
