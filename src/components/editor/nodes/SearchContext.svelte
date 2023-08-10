@@ -86,25 +86,27 @@
         <!-- Nodes with categories -->
         <div class="editor-context-categories">
             {#each Object.keys(filteredSearch) as category}
-                <div class="ec-category">
-                    <div class="ec-category-title">{category}</div>
-                    <div class="ec-category-body">
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        {#each filteredSearch[category] as node}
-                            <div class="ec-node" on:click={() => {
-                                dispatch('nodeselected', {
-                                    node,
-                                    position
-                                });
-                                closeContext();
-                            }}>
-                                <div class="ec-node-title">{node.title}</div>
-                                <div class="ec-node-description">{node.description}</div>
-                            </div>
-                        {/each}
+                {#if filteredSearch[category].length !== 0}
+                    <div class="ec-category">
+                        <div class="ec-category-title">{category}</div>
+                        <div class="ec-category-body">
+                            <!-- svelte-ignore a11y-no-static-element-interactions -->
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            {#each filteredSearch[category] as node}
+                                <div class="ec-node" on:click={() => {
+                                    dispatch('nodeselected', {
+                                        node,
+                                        position
+                                    });
+                                    closeContext();
+                                }}>
+                                    <div class="ec-node-title">{node.title}</div>
+                                    <div class="ec-node-description">{node.description}</div>
+                                </div>
+                            {/each}
+                        </div>
                     </div>
-                </div>
+                {/if}
             {/each}
         </div>
     </div>
