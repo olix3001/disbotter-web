@@ -73,9 +73,11 @@ fn action(builder) {
 - `builder.get_out_var(name)` - Gets the output variable
 - `builder.set_output(name, value)` - Sets the output variable
 - `builder.bind_io(in_var, out_var)` - Directly redirects input to output
+- `builder.map_io(in_var, value)` - Manually add output mapping (use only if you know what you are doing)
 - `builder.push_stack()` - Pushes scope to the stack (automatic in begin_block)
 - `builder.pop_stack()` - Pops scope from the stack (automatic in end_block)
 - `builder.compile_flow_output_here(name)` - Compiles code from the flow output with the given name and adds it to the current node
+- `builder.get_random_var_name()` - Gets a random variable name
 
 However, there is some special syntax that you can use in the node code to make it easier to write:
 

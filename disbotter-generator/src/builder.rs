@@ -149,7 +149,7 @@ impl CodeBuilder {
         if let Some(var) = var_cache.get(&port) {
             return var.clone();
         } else {
-            panic!("Variable for port {:?} not found", port);
+            return "undefined".to_string();
         }
     }
 
@@ -179,6 +179,12 @@ impl CodeBuilder {
             .insert(ovar, ivar);
     }
 
+    pub fn map_io(&mut self, op: String, value: String) {
+        let ovar = PortIdentifier::Output { node_uid: self.current_node_id.clone(), port_key: op.clone() };
+        self.var_cache.lock().unwrap()
+            .insert(ovar, value);
+    }
+
     pub fn push_stack(&mut self) {
         self.var_cache_stack.push(self.var_cache.lock().unwrap().clone());
     }
@@ -202,6 +208,10 @@ impl CodeBuilder {
         // Add the code to the current builder
         self.add_lines(new_builder.finalize_vec());
     }
+
+    pub fn get_random_var_name(&mut self) -> String {
+        NodesJSCompiler::random_var_name()
+    }
 }
 
 impl CustomType for CodeBuilder {
@@ -217,8 +227,10 @@ impl CustomType for CodeBuilder {
             .with_fn("get_out_var", Self::get_out_var)
             .with_fn("set_output", Self::set_output)
             .with_fn("bind_io", Self::bind_io)
+            .with_fn("map_io", Self::map_io)
             .with_fn("push_stack", Self::push_stack)
             .with_fn("pop_stack", Self::pop_stack)
+            .with_fn("get_random_var_name", Self::get_random_var_name)
             .with_fn("compile_flow_output_here", Self::compile_flow_output_here);
     }
 }

@@ -1,7 +1,7 @@
-const id = "_builtin_random_boolean";
+const id = "_builtin_math_random_boolean";
 const title = "Random Boolean";
 const description = "Generates a random boolean value.";
-const category = "Interaction";
+const category = "Math";
 
 const inputs = #{
     true_chance: #{
@@ -12,7 +12,7 @@ const inputs = #{
 };
 const outputs = #{
     result: #{
-        name: "Result",
+        name: "result",
         type: "boolean",
     }
 };

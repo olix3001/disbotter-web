@@ -8,7 +8,7 @@ const pure;
 const inputs = #{};
 const outputs = #{
     interaction: #{
-        name: "Interaction",
+        name: "interaction",
         type: "struct",
         struct_tags: ["interaction", "replyable"]
     }

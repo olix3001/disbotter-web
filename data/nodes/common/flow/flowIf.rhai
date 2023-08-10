@@ -5,18 +5,20 @@ const category = "Flow Control";
 
 const inputs = #{
     condition: #{
-        name: "Condition",
+        name: "condition",
         type: "boolean",
     },
 };
 const outputs = #{
     __flow_if_true: #{
-        name: "If True",
+        name: "if true",
         type: "flow",
+        index: 0
     },
     __flow_if_false: #{
-        name: "If False",
+        name: "if false",
         type: "flow",
+        index: 1
     },
 };
 

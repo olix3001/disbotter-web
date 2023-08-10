@@ -7,13 +7,13 @@ const pure;
 
 const inputs = #{
     text: #{
-        name: "Text",
+        name: "text",
         type: "text",
     },
 };
 const outputs = #{
     message: #{
-        name: "Message",
+        name: "message",
         type: "struct",
         struct_tags: ["sendable"]
     },

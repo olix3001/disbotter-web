@@ -1,6 +1,7 @@
-use std::{path::PathBuf, collections::{HashMap, BTreeMap}, fs::{self, File}};
+use std::{path::PathBuf, collections::{HashMap, BTreeMap}, fs::{self, File}, hash::Hash, fmt::{Debug, Formatter}};
 
 use rhai::{Engine, Dynamic};
+use serde::ser::SerializeMap;
 
 use crate::compiler::upgrade_engine;
 
@@ -50,8 +51,8 @@ impl NodeScriptLoader {
             title: Self::get_variable(&variables, "title")?,
             description: Self::get_variable(&variables, "description")?,
             category: Self::get_variable(&variables, "category")?,
-            inputs: HashMap::new(),
-            outputs: HashMap::new(),
+            inputs: KeyMap::new(),
+            outputs: KeyMap::new(),
             default_hardcoded: HashMap::new(),
         };
 
@@ -77,7 +78,9 @@ impl NodeScriptLoader {
 
         // Add inputs
         let inputs = Self::get_variable::<rhai::Map>(&variables, "inputs")?;
-        for (name, input) in inputs {
+        let mut index_map = HashMap::<String, usize>::new();
+        let mut imap = HashMap::new();
+        for (name, input) in inputs.iter() {
             let input = input.clone().cast::<rhai::Map>();
             let input = input.iter()
                 .map(|(name, value)| (name.to_string(), value.clone_cast()))
@@ -88,7 +91,15 @@ impl NodeScriptLoader {
 
             let default = input.get("start_value");
 
-            node.inputs.insert(name.to_string(), NodeIO {
+            let index = input.get("index");
+            if let Some(index) = index {
+                let index = index.clone_cast::<i64>();
+                index_map.insert(name.to_string(), index as usize);
+            } else {
+                index_map.insert(name.to_string(), 100);
+            }
+            
+            let io = NodeIO {
                 ty: NodeIOTy {
                     ty: match ty.as_str() {
                         "flow" => DataType::Flow,
@@ -106,7 +117,9 @@ impl NodeScriptLoader {
                     }
                 },
                 name: display_name.to_string(),
-            });
+            };
+
+            imap.insert(name.to_string(), io);
 
             if default.is_some() {
                 node.default_hardcoded.insert(name.to_string(), default.unwrap().clone());
@@ -115,6 +128,8 @@ impl NodeScriptLoader {
 
         // Add outputs
         let outputs = Self::get_variable::<rhai::Map>(&variables, "outputs")?;
+        let mut output_index_map = HashMap::<String, usize>::new();
+        let mut omap = HashMap::new();
         for (name, output) in outputs {
             let output = output.clone().cast::<rhai::Map>();
             let output = output.iter().map(|(k, v)| (k.to_string(), v)).collect::<HashMap<String, &Dynamic>>();
@@ -122,7 +137,15 @@ impl NodeScriptLoader {
             let display_name = output.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
             let struct_type: Option<&&Dynamic> = output.get("struct_tags");
 
-            node.outputs.insert(name.to_string(), NodeIO {
+            let index = output.get("index");
+            if let Some(index) = index {
+                let index = index.clone_cast::<i64>();
+                output_index_map.insert(name.to_string(), index as usize);
+            } else {
+                output_index_map.insert(name.to_string(), 100);
+            }
+
+            omap.insert(name.to_string(), NodeIO {
                 ty: NodeIOTy {
                     ty: match ty.as_str() {
                         "flow" => DataType::Flow,
@@ -143,7 +166,74 @@ impl NodeScriptLoader {
             });
         }
 
+        node.inputs.extend_from_map_and_keymap(imap, index_map);
+        node.outputs.extend_from_map_and_keymap(omap, output_index_map);
+
         Ok(node)
+    }
+}
+
+pub struct KeyMap<K, V> {
+    pub keys: Vec<K>,
+    pub values: HashMap<K, V>,
+}
+
+impl<K, V> serde::Serialize for KeyMap<K, V> where K: serde::Serialize + Eq + Hash, V: serde::Serialize {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
+        let mut smap = serializer.serialize_map(Some(self.keys.len()))?;
+        for key in self.keys.iter() {
+            smap.serialize_entry(key, self.values.get(key).unwrap())?;
+        }
+        smap.end()
+    }
+}
+
+impl<'de, K, V> serde::Deserialize<'de> for KeyMap<K, V> where K: serde::Deserialize<'de> + Eq + Hash + Clone, V: serde::Deserialize<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
+        let map = HashMap::<K, V>::deserialize(deserializer)?;
+        let keys = map.keys().cloned().collect::<Vec<K>>();
+        Ok(Self {
+            keys,
+            values: map,
+        })
+    }
+}
+
+impl<K, V> Debug for KeyMap<K, V> where K: Debug, V: Debug {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_map().entries(self.values.iter()).finish()
+    }
+}
+
+impl<K, V> KeyMap<K, V> where K: Clone + Hash + Eq {
+    pub fn from_map_and_keymap(map: HashMap<K, V>, keymap: HashMap<K, usize>) -> Self {
+        let mut keys = keymap.into_iter().collect::<Vec<(K, usize)>>();
+        keys.sort_by(|(_, a), (_, b)| a.cmp(b));
+        let keys = keys.into_iter().map(|(k, _)| k).collect::<Vec<K>>();
+        Self {
+            keys,
+            values: map,
+        }
+    }
+
+    pub fn new() -> Self {
+        Self {
+            keys: vec![],
+            values: HashMap::new(),
+        }
+    }
+
+    pub fn insert(&mut self, key: K, value: V) {
+        self.keys.push(key.clone());
+        self.values.insert(key, value);
+    }
+
+    pub fn extend_from_map_and_keymap(&mut self, map: HashMap<K, V>, keymap: HashMap<K, usize>) {
+        let mut keys = keymap.into_iter().collect::<Vec<(K, usize)>>();
+        keys.sort_by(|(_, a), (_, b)| a.cmp(b));
+        let keys = keys.into_iter().map(|(k, _)| k).collect::<Vec<K>>();
+        self.keys.extend(keys);
+        self.values.extend(map);
     }
 }
 
@@ -153,8 +243,8 @@ pub struct Node {
     pub title: String,
     pub description: String,
     pub category: String,
-    pub inputs: HashMap<String, NodeIO>,
-    pub outputs: HashMap<String, NodeIO>,
+    pub inputs: KeyMap<String, NodeIO>,
+    pub outputs: KeyMap<String, NodeIO>,
     #[serde(rename = "defaultHardcoded")]
     pub default_hardcoded: HashMap<String, Dynamic>,
 }

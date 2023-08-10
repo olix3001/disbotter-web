@@ -10,6 +10,7 @@ fn generate_node_declarations() {
     let command_nodes = load_all_nodes("../data/nodes/command".into());
     let nodes = common_nodes.into_iter().chain(command_nodes.into_iter()).collect();
     export_node_declarations(nodes, "../static/generated/command_node_declarations.json".into());
+    println!("Node declarations generated!");
 }
 
 fn test_output() {

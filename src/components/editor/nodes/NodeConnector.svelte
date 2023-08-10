@@ -46,7 +46,7 @@
             const cc = $PROJECT.currentConnection;
             
             if (
-                (cc?.type !== type && cc?.type !== NodeConnectionType.Any) ||
+                (cc?.type !== type && cc?.type !== NodeConnectionType.Any && type !== NodeConnectionType.Any) ||
                 (cc?.type == NodeConnectionType.Structure && (
                     (isEndPort && !satisfiesTags(cc.sTags??[], sTags)) ||
                     (!isEndPort && !satisfiesTags(sTags, cc.sTags??[]))

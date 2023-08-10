@@ -195,7 +195,7 @@ impl NodesJSCompiler {
             // If input is not mapped already
             if !var_cache.contains_key(&PortIdentifier::Input { node_uid: node.uid.clone(), port_key: key.clone() }) {
                 // Map
-                var_cache.insert(PortIdentifier::Input { node_uid: node.uid.clone(), port_key: key.clone() }, value.to_string());
+                var_cache.insert(PortIdentifier::Input { node_uid: node.uid.clone(), port_key: key.clone() }, get_raw_value(value));
             }
         }
     }
@@ -283,6 +283,15 @@ fn expr_shortcut_set_output(context: &mut EvalContext, inputs: &[Expression]) ->
     Ok(Dynamic::from(()))
 }
 
+fn get_raw_value(value: &serde_json::Value) -> String {
+    match value {
+        serde_json::Value::String(s) => format!("\"{}\"", s),
+        serde_json::Value::Number(n) => n.as_f64().unwrap().to_string(),
+        serde_json::Value::Bool(b) => b.to_string(),
+        _ => "".to_string()
+    }
+}
+
 pub fn upgrade_engine(engine: &mut Engine) {
     // CodeBuilder Type
     engine.build_type::<CodeBuilder>();
@@ -348,6 +357,8 @@ impl AvailableNode {
                         is_pure
                     });
                 }
+            } else if file_path.is_dir() {
+                nodes.append(&mut Self::load_nodes(file_path, engine));
             }
         }
         nodes

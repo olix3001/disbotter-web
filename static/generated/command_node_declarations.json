@@ -10,7 +10,7 @@
           "type": 2,
           "structTags": []
         },
-        "name": "Text"
+        "name": "text"
       }
     },
     "outputs": {
@@ -21,7 +21,7 @@
             "sendable"
           ]
         },
-        "name": "Message"
+        "name": "message"
       }
     },
     "defaultHardcoded": {}
@@ -44,7 +44,7 @@
           "type": 3,
           "structTags": []
         },
-        "name": "Condition"
+        "name": "condition"
       }
     },
     "outputs": {
@@ -55,42 +55,115 @@
         },
         "name": "flow_out"
       },
-      "__flow_if_false": {
-        "type": {
-          "type": 0,
-          "structTags": []
-        },
-        "name": "If False"
-      },
       "__flow_if_true": {
         "type": {
           "type": 0,
           "structTags": []
         },
-        "name": "If True"
+        "name": "if true"
+      },
+      "__flow_if_false": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "if false"
       }
     },
     "defaultHardcoded": {}
   },
   {
-    "id": "_builtin_random_boolean",
-    "title": "Random Boolean",
-    "description": "Generates a random boolean value.",
-    "category": "Interaction",
+    "id": "_builtin_flow_loop_times",
+    "title": "Loop N Times",
+    "description": "Loops a set number of times.",
+    "category": "Flow Control",
     "inputs": {
-      "true_chance": {
-        "type": {
-          "type": 1,
-          "structTags": []
-        },
-        "name": "True Chance"
-      },
       "__flow_in__": {
         "type": {
           "type": 0,
           "structTags": []
         },
         "name": "flow_in"
+      },
+      "n": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "N"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      },
+      "__flow_loop": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "loop"
+      }
+    },
+    "defaultHardcoded": {
+      "n": 1
+    }
+  },
+  {
+    "id": "_builtin_math_add_numbers",
+    "title": "Add Numbers",
+    "description": "Add two numbers together. (A + B)",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "A"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "B"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_logic_and",
+    "title": "And",
+    "description": "Returns true if both inputs are true, false otherwise.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "b"
       }
     },
     "outputs": {
@@ -99,19 +172,594 @@
           "type": 3,
           "structTags": []
         },
-        "name": "Result"
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_number_constant",
+    "title": "Constant number",
+    "description": "Constant value.",
+    "category": "Math",
+    "inputs": {
+      "number": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "number"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "value"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cosine",
+    "title": "Cosine",
+    "description": "Compute the cosine of a number. This uses radians, not degrees.",
+    "category": "Math",
+    "inputs": {
+      "x": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "x"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "cos(x)"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_divide_numbers",
+    "title": "Divide Numbers",
+    "description": "Divide two numbers. (A / B)",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "A"
       },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "B"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_eq",
+    "title": "Equals",
+    "description": "Check if two things are equal.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_ge",
+    "title": "Greater or Equal",
+    "description": "Check if first value is greater than or equal to second value.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_gt",
+    "title": "Greater than",
+    "description": "Compare two values and return true if the first is greater than the second.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_bool_invert",
+    "title": "Invert Boolean",
+    "description": "Invert a boolean value.",
+    "category": "Math",
+    "inputs": {
+      "value": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "value"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_le",
+    "title": "Less or Equal",
+    "description": "Check if first value is less than or equal to second value.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_lt",
+    "title": "Less Than",
+    "description": "Compare two values and return true if the first is less than the second.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_multiply_numbers",
+    "title": "Multiply Numbers",
+    "description": "Multiply two numbers together. (A * B)",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "A"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "B"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_cmp_neq",
+    "title": "Not equal",
+    "description": "Check if two values are not equal.",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_logic_or",
+    "title": "Or",
+    "description": "Returns true if either of the inputs are true, false otherwise",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "a"
+      },
+      "b": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "b"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_random_boolean",
+    "title": "Random Boolean",
+    "description": "Generates a random boolean value.",
+    "category": "Math",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "true_chance": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "True Chance"
+      }
+    },
+    "outputs": {
       "__flow_out__": {
         "type": {
           "type": 0,
           "structTags": []
         },
         "name": "flow_out"
+      },
+      "result": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "result"
       }
     },
     "defaultHardcoded": {
       "true_chance": 0.5
     }
+  },
+  {
+    "id": "_builtin_math_random_integer",
+    "title": "Random Integer",
+    "description": "Generate a random integer between two values.",
+    "category": "Math",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "min": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "minimum"
+      },
+      "max": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "maximum"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      },
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {
+      "min": 0,
+      "max": 100
+    }
+  },
+  {
+    "id": "_builtin_math_random_number",
+    "title": "Random Number",
+    "description": "Generate a random number in the specified range.",
+    "category": "Math",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "min": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "minimum"
+      },
+      "max": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "maximum"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      },
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {
+      "max": 1,
+      "min": 0
+    }
+  },
+  {
+    "id": "_builtin_math_sine",
+    "title": "Sine",
+    "description": "Compute the sine of a number. This uses radians, not degrees.",
+    "category": "Math",
+    "inputs": {
+      "x": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "x"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "sin(x)"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_subtract_numbers",
+    "title": "Subtract Numbers",
+    "description": "Subtract one number from another. (A - B)",
+    "category": "Math",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "A"
+      },
+      "b": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "B"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_math_tangens",
+    "title": "Tangens",
+    "description": "Computes the tangens of a number. The number is in radians, not degrees.",
+    "category": "Math",
+    "inputs": {
+      "x": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "x"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "tan(x)"
+      }
+    },
+    "defaultHardcoded": {}
   },
   {
     "id": "_builtin_interaction_reply",
@@ -126,15 +774,6 @@
         },
         "name": "flow_in"
       },
-      "reply": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "sendable"
-          ]
-        },
-        "name": "Reply"
-      },
       "target": {
         "type": {
           "type": 4,
@@ -143,6 +782,189 @@
           ]
         },
         "name": "Target"
+      },
+      "reply": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "sendable"
+          ]
+        },
+        "name": "Reply"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_text_combine",
+    "title": "Combine Text",
+    "description": "Combines two text values into one.",
+    "category": "Text",
+    "inputs": {
+      "a": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "text A"
+      },
+      "b": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "text B"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_any_to_text",
+    "title": "To Text",
+    "description": "Converts any value to text.",
+    "category": "Text",
+    "inputs": {
+      "value": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "value"
+      }
+    },
+    "outputs": {
+      "text": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "text"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_var_define",
+    "title": "Define variable",
+    "description": "Define a variable with a given name and value.",
+    "category": "Variables",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "name": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "variable"
+      },
+      "value": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "value"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_var_get",
+    "title": "Get Variable",
+    "description": "Get the value of a variable.",
+    "category": "Variables",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "name": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "variable"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      },
+      "value": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "value"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_var_set",
+    "title": "Set Variable",
+    "description": "Set a variable to a value.",
+    "category": "Variables",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "name": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "variable"
+      },
+      "value": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "value"
       }
     },
     "outputs": {
@@ -171,7 +993,7 @@
             "replyable"
           ]
         },
-        "name": "Interaction"
+        "name": "interaction"
       }
     },
     "defaultHardcoded": {}
@@ -189,6 +1011,209 @@
           "structTags": []
         },
         "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_interaction_break",
+    "title": "Break Interaction",
+    "description": "Break up an interaction into its components.",
+    "category": "Utility",
+    "inputs": {
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "interaction"
+          ]
+        },
+        "name": "interaction"
+      }
+    },
+    "outputs": {
+      "guild": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "guild"
+          ]
+        },
+        "name": "guild"
+      },
+      "channel": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "channel",
+            "guild_channel"
+          ]
+        },
+        "name": "channel"
+      },
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "member"
+          ]
+        },
+        "name": "member"
+      },
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user"
+          ]
+        },
+        "name": "user"
+      },
+      "ephemeral": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "ephemeral"
+      },
+      "deferred": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "deferred"
+      },
+      "replied": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "replied"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_member_break",
+    "title": "Break Member",
+    "description": "Break member into its components.",
+    "category": "Utility",
+    "inputs": {
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "member"
+      }
+    },
+    "outputs": {
+      "bannable": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "bannable"
+      },
+      "kickable": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "kickable"
+      },
+      "dm_channel": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "DM channel"
+      },
+      "guild": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "guild"
+      },
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "user"
+      },
+      "id": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "id"
+      },
+      "nickname": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "nickname"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_user_break",
+    "title": "Break User",
+    "description": "Break user into its component parts.",
+    "category": "Utility",
+    "inputs": {
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user"
+          ]
+        },
+        "name": "user"
+      }
+    },
+    "outputs": {
+      "bot": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "bot"
+      },
+      "discriminator": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "discriminator"
+      },
+      "username": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "username"
+      },
+      "tag": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "tag"
+      },
+      "dm_channel": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "channel",
+            "dm_channel"
+          ]
+        },
+        "name": "DM channel"
       }
     },
     "defaultHardcoded": {}

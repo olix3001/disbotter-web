@@ -7,12 +7,14 @@ const inputs = #{
     target: #{
         name: "Target",
         type: "struct",
-        struct_tags: ["replyable"]
+        struct_tags: ["replyable"],
+        index: 0
     },
     reply: #{
         name: "Reply",
         type: "struct",
-        struct_tags: ["sendable"]
+        struct_tags: ["sendable"],
+        index: 1
     },
 };
 const outputs = #{};
