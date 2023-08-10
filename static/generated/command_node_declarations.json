@@ -1,0 +1,177 @@
+[
+  {
+    "id": "_builtin_create_text_message",
+    "title": "Create Text Tessage",
+    "description": "Create a message from the given text.",
+    "category": "Interaction",
+    "inputs": {
+      "text": {
+        "type": {
+          "type": 2,
+          "structType": ""
+        },
+        "name": "Text"
+      }
+    },
+    "outputs": {
+      "message": {
+        "type": {
+          "type": 4,
+          "structType": "sendable_message"
+        },
+        "name": "Message"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_flow_if",
+    "title": "Branch If",
+    "description": "Branches the flow based on a condition.",
+    "category": "Flow Control",
+    "inputs": {
+      "condition": {
+        "type": {
+          "type": 3,
+          "structType": ""
+        },
+        "name": "Condition"
+      },
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_in"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_out"
+      },
+      "__flow_if_false": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "If False"
+      },
+      "__flow_if_true": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "If True"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_random_boolean",
+    "title": "Random Boolean",
+    "description": "Generates a random boolean value.",
+    "category": "Interaction",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_in"
+      },
+      "true_chance": {
+        "type": {
+          "type": 1,
+          "structType": ""
+        },
+        "name": "True Chance"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_out"
+      },
+      "result": {
+        "type": {
+          "type": 3,
+          "structType": ""
+        },
+        "name": "Result"
+      }
+    },
+    "defaultHardcoded": {
+      "true_chance": 0.5
+    }
+  },
+  {
+    "id": "_builtin_interaction_reply",
+    "title": "Reply",
+    "description": "Reply to an interaction with a message or embed.",
+    "category": "Interaction",
+    "inputs": {
+      "target": {
+        "type": {
+          "type": 4,
+          "structType": "discord_interaction"
+        },
+        "name": "Target"
+      },
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_in"
+      },
+      "reply": {
+        "type": {
+          "type": 4,
+          "structType": "sendable_message"
+        },
+        "name": "Reply"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_on_command",
+    "title": "On Command",
+    "description": "Triggered when a command is executed.",
+    "category": "Events",
+    "inputs": {},
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structType": ""
+        },
+        "name": "flow_out"
+      },
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structType": "discord_interaction"
+        },
+        "name": "Interaction"
+      }
+    },
+    "defaultHardcoded": {}
+  }
+]

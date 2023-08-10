@@ -7,18 +7,30 @@
 	import ProjectStructure from "../../components/editor/ProjectStructure.svelte";
 	import NodeEditor from "../../components/editor/nodes/NodeEditor.svelte";
 	import Properties from "../../components/editor/Properties.svelte";
+    import { writable } from "svelte/store";
 
-    let project = new DisbotterProject('New project');
+    let project = writable(new DisbotterProject('New project'));
+
+    function handleMenuClick(e: any) {
+        const action = e.detail.action;
+        if (action == 'new') {
+            $project = new DisbotterProject('New project');
+        }
+
+        if (action == 'save') {
+            $project.exportToFile();
+        }
+    }
 </script>
 
 <div style="width: 100vw; height: 100vh; overflow: hidden;">
-    <Navbar />
+    <Navbar on:menuclick={handleMenuClick}/>
 
     <div class="topbar">
-        <p class="project-name">{project.name}</p>
+        <p class="project-name">{$project.name}</p>
     </div>
 
-    <ProjectProvider bind:project>
+    <ProjectProvider bind:PROJECT={project}>
         <Splitpanes style="height: 100%" theme="dark-splitpane-theme">
             <Pane minSize={12} size={15}>
                 <div class="sidebar pane">

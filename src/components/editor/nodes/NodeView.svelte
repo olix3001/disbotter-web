@@ -64,7 +64,6 @@
         {#if node.type.inputs.__flow_in__}
             <NodeConnector 
                 color="white" 
-                style="double" 
                 type={NodeConnectionType.Flow}
                 bind:port={node.iPorts["__flow_in__"]} 
                 node={node}
@@ -82,7 +81,6 @@
         {#if node.type.outputs.__flow_out__}
             <NodeConnector 
                 color="white" 
-                style="double" 
                 type={NodeConnectionType.Flow}
                 bind:port={node.oPorts["__flow_out__"]} 
                 node={node}
@@ -123,7 +121,7 @@
             {#each Object.entries(node.type.outputs) as output}
                 {#if output[0] !== "__flow_out__"}
                     <div class="nf-block nf-o">
-                        <p>{output[0]}</p>
+                        <p>{output[1].name}</p>
                         <NodeConnector 
                             type={output[1].type.type} 
                             bind:port={node.oPorts[output[1].name]} 
@@ -270,6 +268,7 @@
     .nvh-center {
         justify-content: center !important;
         align-items: center !important;
+        text-align: center;
     }
 
     .nvh-title {

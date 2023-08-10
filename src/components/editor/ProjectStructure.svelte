@@ -56,27 +56,29 @@
     }
 
     .header button {
-        background-color: #060606;
+        background-color: #1f1f1f;
         border: none;
         color: var(--white);
         padding: .3em;
         cursor: pointer;
     }
 
+    .header button:hover {
+        background-color: #0f0f0f;
+    }
+
     .element {
         cursor: pointer;
+        margin-bottom: .2em;
     }
 
     .element:hover {
-        background-color: #060606;
+        background-color: #0f0f0f;
     }
 
     .selected {
-        background-color: #427ade;
-    }
-
-    .selected:hover {
-        background-color: #427bef;
+        color: #4d86ff;
+        padding-left: .25rem;
     }
 
 </style>

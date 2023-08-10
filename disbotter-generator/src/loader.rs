@@ -50,15 +50,13 @@ impl NodeScriptLoader {
             title: Self::get_variable(&variables, "title")?,
             description: Self::get_variable(&variables, "description")?,
             category: Self::get_variable(&variables, "category")?,
-            color: Self::get_variable(&variables, "color")?,
-            icon: Self::get_variable(&variables, "icon")?,
             inputs: HashMap::new(),
             outputs: HashMap::new(),
             default_hardcoded: HashMap::new(),
         };
 
         // Add flow io
-        if !variables.contains_key("noFlowIn") {
+        if !variables.contains_key("noFlowIn") && !variables.contains_key("pure") {
             node.inputs.insert("__flow_in__".to_string(), NodeIO {
                 ty: NodeIOTy {
                     ty: DataType::Flow,
@@ -67,7 +65,7 @@ impl NodeScriptLoader {
                 name: "flow_in".to_string(),
             });
         }
-        if !variables.contains_key("noFlowOut") {
+        if !variables.contains_key("noFlowOut") && !variables.contains_key("pure") {
             node.outputs.insert("__flow_out__".to_string(), NodeIO {
                 ty: NodeIOTy {
                     ty: DataType::Flow,
@@ -88,7 +86,7 @@ impl NodeScriptLoader {
             let display_name = input.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
             let struct_type = input.get("struct_type");
 
-            let default = input.get("default");
+            let default = input.get("start_value");
 
             node.inputs.insert(name.to_string(), NodeIO {
                 ty: NodeIOTy {
@@ -97,7 +95,7 @@ impl NodeScriptLoader {
                         "number" => DataType::Number,
                         "text" => DataType::Text,
                         "boolean" => DataType::Boolean,
-                        "structure" => DataType::Structure,
+                        "struct" => DataType::Structure,
                         _ => DataType::Any,
                     },
                     struct_type: if struct_type.is_some() {
@@ -149,8 +147,6 @@ pub struct Node {
     pub title: String,
     pub description: String,
     pub category: String,
-    pub color: String,
-    pub icon: String,
     pub inputs: HashMap<String, NodeIO>,
     pub outputs: HashMap<String, NodeIO>,
     #[serde(rename = "defaultHardcoded")]

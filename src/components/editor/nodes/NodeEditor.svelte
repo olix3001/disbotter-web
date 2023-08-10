@@ -24,6 +24,12 @@
     const selectedNodes = setContext("selectedNodes", writable([]))
     
     function zoomEditor(event: WheelEvent) {
+
+        // If editor-context-search is part of the target, don't zoom
+        if (event.target instanceof HTMLElement && event.target.closest(".editor-context-search")) return;
+
+        event.preventDefault();
+
         const zoomAmount = event.deltaY * -0.001;
         const zoom = editorZoom + zoomAmount;
 
@@ -97,7 +103,7 @@
                     y: y,
                     iPorts: {},
                     oPorts: {},
-                    inputHardcoded: node.defaultHardcoded ?? {},
+                    inputHardcoded: window.structuredClone(node.defaultHardcoded ?? {}),
                 }
             )
             return project;
@@ -125,7 +131,7 @@
         class="editor"
         bind:this={EDITOR}
         on:contextmenu|preventDefault|stopPropagation={openContextMenu}
-        on:wheel|preventDefault={zoomEditor}
+        on:wheel={zoomEditor}
         >
         <svg 
             class="editor-background"

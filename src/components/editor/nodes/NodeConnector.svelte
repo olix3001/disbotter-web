@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { NodeConnectionType, getNodeConnectionTypeColor, type ENode } from "$lib/editor/node";
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
-	import { getContext, onDestroy, onMount } from "svelte";
+	import { getContext } from "svelte";
 
     export let isEndPort: boolean = false;
     export let node: ENode;
@@ -9,8 +9,8 @@
     export let color: string = "auto";
     export let type: NodeConnectionType = NodeConnectionType.Any;
     export let sType: string = "";
-    export let style: "default" | "double" = "default";
     export let port: SVGSVGElement;
+    $: style = type === NodeConnectionType.Flow ? "double" : "default";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
         
@@ -43,7 +43,7 @@
             
             if (
                 (cc?.type !== type && cc?.type !== NodeConnectionType.Any) ||
-                (cc?.type == NodeConnectionType.Structure && cc?.sType == sType)
+                (cc?.type == NodeConnectionType.Structure && cc?.sType != sType)
             ) {
                 PROJECT.update((p) => {
                     p.currentConnection = null;

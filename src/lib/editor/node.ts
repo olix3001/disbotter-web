@@ -3,8 +3,6 @@ export interface NodeType {
 	title: string;
 	description: string;
 	category: string;
-	color: string;
-	icon: string;
 
 	inputs: NodeIOType;
 	outputs: NodeIOType;
@@ -75,4 +73,28 @@ export interface NodeFlow {
 	connections: NodeConnection[];
 
 	availableNodes: NodeType[];
+}
+
+export function flowToJSONParseable(flow: NodeFlow): any {
+	return {
+		nodes: flow.nodes.map((node) => {
+			return {
+				uid: node.uid,
+				type: node.type.id,
+				x: node.x,
+				y: node.y,
+				inputHardcoded: node.inputHardcoded
+			};
+		}),
+		connections: flow.connections.map((conn) => {
+			return {
+				type: conn.type,
+				sType: conn.sType,
+				from: conn.from?.uid,
+				fromKey: conn.fromKey,
+				to: conn.to?.uid,
+				toKey: conn.toKey
+			};
+		})
+	};
 }

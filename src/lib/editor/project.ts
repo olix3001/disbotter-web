@@ -5,7 +5,8 @@ import {
 	type NodeFlow,
 	type NodeIO,
 	type NodeConnection,
-	type NodeType
+	type NodeType,
+	flowToJSONParseable
 } from './node';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
@@ -117,6 +118,35 @@ export class DisbotterProject {
 			this.currentlyEditing = { type: 'command', command: target };
 		}
 	}
+
+	public toJSONParseable(): any {
+		// First, serialize all project metadata
+		const project = {
+			metadata: {
+				name: this.name
+			},
+			content: {
+				commands: this.commands.map((command) => command.toJSONParseable())
+			}
+		};
+		return project;
+	}
+
+	public exportToFile(): void {
+		const data = JSON.stringify(this.toJSONParseable());
+		// Download the file to the user
+		const element = document.createElement('a');
+		const blob = new Blob([data], { type: 'text/plain' });
+		element.setAttribute('href', window.URL.createObjectURL(blob));
+		element.setAttribute('download', this.name + '.dbp');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+	}
 }
 
 export async function loadNodeDeclarations(file: string): Promise<NodeType[]> {
@@ -127,7 +157,7 @@ export async function loadNodeDeclarations(file: string): Promise<NodeType[]> {
 let commandAvailableNodes: NodeType[] = [];
 
 if (typeof document !== 'undefined') {
-	loadNodeDeclarations('/generated/node_declarations.json').then((nodes) => {
+	loadNodeDeclarations('/generated/command_node_declarations.json').then((nodes) => {
 		commandAvailableNodes = nodes;
 		console.log(commandAvailableNodes);
 	});
@@ -148,6 +178,15 @@ export class Command {
 			nodes: [],
 			connections: [],
 			availableNodes: commandAvailableNodes
+		};
+	}
+
+	public toJSONParseable(): any {
+		return {
+			uid: this.uid,
+			name: this.name,
+			description: this.description,
+			flow: flowToJSONParseable(this.flow)
 		};
 	}
 }
