@@ -124,9 +124,9 @@
                         <p>{output[1].name}</p>
                         <NodeConnector 
                             type={output[1].type.type} 
-                            bind:port={node.oPorts[output[1].name]} 
+                            bind:port={node.oPorts[output[0]]} 
                             node={node}
-                            key={output[1].name}
+                            key={output[0]}
                             sType={output[1].type.structType}
                             />
                     </div>

@@ -20,4 +20,15 @@ const outputs = #{
     },
 };
 
-fn action(builder) { }
+fn action(builder) {
+    let condition = builder.get_input("condition");
+    builder.add_line(`if (${condition}) {`);
+    builder.begin_block();
+    builder.compile_flow_output_here("__flow_if_true");
+    builder.end_block();
+    builder.add_line("} else {");
+    builder.begin_block();
+    builder.compile_flow_output_here("__flow_if_false");
+    builder.end_block();
+    builder.add_line("}");
+}

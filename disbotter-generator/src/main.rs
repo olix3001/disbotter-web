@@ -1,3 +1,4 @@
+use compiler::NodesJSCompiler;
 use loader::{load_all_nodes, export_node_declarations};
 
 pub mod loader;
@@ -12,5 +13,9 @@ fn load_command_nodes() {
 }
 
 fn main() {
-    load_command_nodes();
+    let mut compiler = NodesJSCompiler::new(NodesJSCompiler::load_project("C:\\Users\\Oliwier\\Downloads\\yooo.dbp".into()));
+    compiler.add_available_nodes("../data/nodes/common".into());
+    compiler.add_available_nodes("../data/nodes/command".into());
+    let project = compiler.compile_project();
+    project.debug_print()
 }
