@@ -31,6 +31,7 @@
     );
 
     const unsubscribeProject = PROJECT.subscribe((project) => {
+        categorizedNodes = {};
         project.getCurrentFlow()?.availableNodes.forEach(an => {
             if (!categorizedNodes[an.category]) categorizedNodes[an.category] = [];
             categorizedNodes[an.category].push(an);

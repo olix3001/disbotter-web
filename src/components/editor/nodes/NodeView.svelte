@@ -55,6 +55,9 @@
     function isInputConnected(input: string) {
         return $PROJECT.getCurrentFlow()?.connections.some((c) => c.to === node && c.toKey === input);
     }
+
+    $: isEmpty = Object.keys(node.type.inputs).length === (node.type.inputs.__flow_in__ ? 1 : 0) &&
+        Object.keys(node.type.outputs).length === (node.type.outputs.__flow_out__ ? 1 : 0);
 </script>
 
 <div class="node-view" style={offsetCSS} class:nv-selected={isSelected}>
@@ -92,55 +95,57 @@
                 />
         {/if}
     </div>
-    <div class="node-view-body">
-        <div class="nvb-inputs">
-            {#each Object.entries(node.type.inputs) as input}
-                {#if input[0] !== "__flow_in__"}
-                    <div class="nf-block nf-i">
-                        <NodeConnector 
-                            type={input[1].type.type} 
-                            bind:port={node.iPorts[input[0]]} 
-                            node={node}
-                            key={input[0]}
-                            sTags={input[1].type.structTags}
-                            isEndPort
-                            />
-                        {#if isInputConnected(input[0])}
-                            <p>{input[1].name}</p>
-                        {:else}
-                            {#if input[1].type.type === NodeConnectionType.Number}
-                                <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
-                            {:else if input[1].type.type === NodeConnectionType.Text}
-                                <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
-                            {:else if input[1].type.type === NodeConnectionType.Boolean}
-                                <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
-                                <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label>{input[1].name}</label>
-                            {:else}
+    {#if !isEmpty}
+        <div class="node-view-body">
+            <div class="nvb-inputs">
+                {#each Object.entries(node.type.inputs) as input}
+                    {#if input[0] !== "__flow_in__"}
+                        <div class="nf-block nf-i">
+                            <NodeConnector 
+                                type={input[1].type.type} 
+                                bind:port={node.iPorts[input[0]]} 
+                                node={node}
+                                key={input[0]}
+                                sTags={input[1].type.structTags}
+                                isEndPort
+                                />
+                            {#if isInputConnected(input[0])}
                                 <p>{input[1].name}</p>
+                            {:else}
+                                {#if input[1].type.type === NodeConnectionType.Number}
+                                    <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
+                                {:else if input[1].type.type === NodeConnectionType.Text}
+                                    <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
+                                {:else if input[1].type.type === NodeConnectionType.Boolean}
+                                    <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
+                                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                                    <label>{input[1].name}</label>
+                                {:else}
+                                    <p>{input[1].name}</p>
+                                {/if}
                             {/if}
-                        {/if}
-                    </div>
-                {/if}
-            {/each}
+                        </div>
+                    {/if}
+                {/each}
+            </div>
+            <div class="nvb-outputs">
+                {#each Object.entries(node.type.outputs) as output}
+                    {#if output[0] !== "__flow_out__"}
+                        <div class="nf-block nf-o">
+                            <p>{output[1].name}</p>
+                            <NodeConnector 
+                                type={output[1].type.type} 
+                                bind:port={node.oPorts[output[0]]} 
+                                node={node}
+                                key={output[0]}
+                                sTags={output[1].type.structTags}
+                                />
+                        </div>
+                    {/if}
+                {/each}
+            </div>
         </div>
-        <div class="nvb-outputs">
-            {#each Object.entries(node.type.outputs) as output}
-                {#if output[0] !== "__flow_out__"}
-                    <div class="nf-block nf-o">
-                        <p>{output[1].name}</p>
-                        <NodeConnector 
-                            type={output[1].type.type} 
-                            bind:port={node.oPorts[output[0]]} 
-                            node={node}
-                            key={output[0]}
-                            sTags={output[1].type.structTags}
-                            />
-                    </div>
-                {/if}
-            {/each}
-        </div>
-    </div>
+    {/if}
 </div>
 
 <svelte:body on:mousemove={moveNode} on:mouseup={stopDrag} />

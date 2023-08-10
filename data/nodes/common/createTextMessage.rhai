@@ -1,5 +1,5 @@
 const id = "_builtin_create_text_message";
-const title = "Create Text Tessage";
+const title = "Create Text Message";
 const description = "Create a message from the given text.";
 const category = "Interaction";
 

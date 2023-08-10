@@ -173,9 +173,10 @@ impl CodeBuilder {
     }
 
     pub fn bind_io(&mut self, ip: String, op: String) {
-        let ovar = self.get_out_var(op.clone());
         let ivar = self.get_in_var(ip.clone());
-        self.add_line(format!("const {} = {}", ovar, ivar));
+        let ovar = PortIdentifier::Output { node_uid: self.current_node_id.clone(), port_key: op.clone() };
+        self.var_cache.lock().unwrap()
+            .insert(ovar, ivar);
     }
 
     pub fn push_stack(&mut self) {

@@ -22,4 +22,5 @@ fn test_output() {
 
 fn main() {
     generate_node_declarations();
+    test_output();
 }

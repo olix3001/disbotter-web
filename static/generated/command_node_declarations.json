@@ -1,7 +1,7 @@
 [
   {
     "id": "_builtin_create_text_message",
-    "title": "Create Text Tessage",
+    "title": "Create Text Message",
     "description": "Create a message from the given text.",
     "category": "Interaction",
     "inputs": {
@@ -126,15 +126,6 @@
         },
         "name": "flow_in"
       },
-      "target": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "replyable"
-          ]
-        },
-        "name": "Target"
-      },
       "reply": {
         "type": {
           "type": 4,
@@ -143,6 +134,15 @@
           ]
         },
         "name": "Reply"
+      },
+      "target": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "replyable"
+          ]
+        },
+        "name": "Target"
       }
     },
     "outputs": {
@@ -157,7 +157,27 @@
     "defaultHardcoded": {}
   },
   {
-    "id": "_builtin_on_command",
+    "id": "_builtin_get_command_interaction",
+    "title": "Get Interaction",
+    "description": "Gets the interaction that triggered the command.",
+    "category": "Interaction",
+    "inputs": {},
+    "outputs": {
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "interaction",
+            "replyable"
+          ]
+        },
+        "name": "Interaction"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "__start__",
     "title": "On Command",
     "description": "Triggered when a command is executed.",
     "category": "Events",
@@ -169,16 +189,6 @@
           "structTags": []
         },
         "name": "flow_out"
-      },
-      "interaction": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "interaction",
-            "replyable"
-          ]
-        },
-        "name": "Interaction"
       }
     },
     "defaultHardcoded": {}

@@ -113,7 +113,7 @@ impl NodesJSCompiler {
         ]);
         builder.increase_ident_by(2);
 
-        self.compile_flow(&command.flow, builder.clone(), "_builtin_on_command");
+        self.compile_flow(&command.flow, builder.clone(), "__start__");
 
         builder.decrease_ident_by(2);
         builder.add_lines(vec![
@@ -233,7 +233,9 @@ impl NodesJSCompiler {
     pub fn compile_flow(&mut self, flow: &DisbotterFlow, mut builder: CodeBuilder, start_node_id: &str) {
         builder.compiler.current_flow = Some(flow.clone());
         // Find the start node
-        let start_node = flow.nodes.iter().find(|n| n.node_type == start_node_id).unwrap();
+        let start_node = flow.nodes.iter().find(|n| n.node_type == start_node_id).expect(
+            "Every flow needs a start node"
+        );
         // Clear the var cache
         self.clear_var_cache();
         // Add interaction key
