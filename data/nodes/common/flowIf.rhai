@@ -21,14 +21,15 @@ const outputs = #{
 };
 
 fn action(builder) {
-    let condition = builder.get_input("condition");
-    builder.add_line(`if (${condition}) {`);
+    let condition = inv condition;
+    
+    -> `if (${condition}) {`;
     builder.begin_block();
     builder.compile_flow_output_here("__flow_if_true");
     builder.end_block();
-    builder.add_line("} else {");
+    -> "} else {";
     builder.begin_block();
     builder.compile_flow_output_here("__flow_if_false");
     builder.end_block();
-    builder.add_line("}");
+    -> "}";
 }

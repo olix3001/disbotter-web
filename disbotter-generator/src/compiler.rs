@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf, sync::{Arc, Mutex}};
 
-use rhai::{Engine, Scope};
+use rhai::{Engine, Scope, EvalContext, Expression, EvalAltResult, Dynamic};
 
 use crate::builder::{CodeBuilder, Program};
 
@@ -37,7 +37,7 @@ pub struct NodesJSCompiler {
 impl NodesJSCompiler {
     pub fn new(project: DisbotterProjectData) -> NodesJSCompiler {
         let mut engine = Engine::new();
-        engine.build_type::<CodeBuilder>();
+        upgrade_engine(&mut engine);
 
         NodesJSCompiler {
             available_nodes: HashMap::new(),
@@ -51,7 +51,7 @@ impl NodesJSCompiler {
 
     pub fn get_cloned_compiler(&self) -> NodesJSCompiler {
         let mut engine = Engine::new();
-        engine.build_type::<CodeBuilder>();
+        upgrade_engine(&mut engine);
 
         NodesJSCompiler {
             available_nodes: self.available_nodes.clone(),
@@ -65,7 +65,11 @@ impl NodesJSCompiler {
 
     pub(crate) fn random_var_name() -> String {
         let id = uuid::Uuid::new_v4();
-        format!("__io_{}", id.to_string().replace("-", "_"))
+        let id = id.to_string();
+        let id = id.split("-");
+        // First two parts of the uuid combined should be enough to be unique
+        let id = format!("{}{}", id.clone().next().unwrap(), id.clone().next().unwrap());
+        format!("{}", id)
     }
 
     pub fn load_project(path: PathBuf) -> DisbotterProjectData {
@@ -98,8 +102,26 @@ impl NodesJSCompiler {
     }
 
     pub fn compile_command(&mut self, command: &DisbotterProjectCommand) {
-        let builder = self.program.get_file_builder(format!("commands/{}.js", command.name), &self.var_cache, self.get_cloned_compiler());
+        let mut builder = self.program.get_file_builder(format!("commands/{}.ts", command.name), &self.var_cache, self.get_cloned_compiler());
+        builder.add_lines(vec![
+            "export default class extends Command {".to_string(),
+            "   public readonly builder = new SlashCommandBuilder()".to_string(),
+            format!("       .setName(\"{}\")", command.name),
+            format!("       .setDescription(\"{}\");", command.description),
+            "".to_string(),
+            "   public async handle(__TRANSLATIONS__: LocalizedTranslations, __INTERACTION__: CommandInteraction): Promise<void> {".to_string(),
+        ]);
+        builder.increase_ident_by(2);
+
         self.compile_flow(&command.flow, builder.clone(), "_builtin_on_command");
+
+        builder.decrease_ident_by(2);
+        builder.add_lines(vec![
+            "   }".to_string(),
+            "}".to_string(),
+        ]);
+        builder.add_import("CommandInteraction, SlashCommandBuilder".to_string(), "discord.js".to_string());
+        builder.add_import("Command, LocalizedTranslations".to_string(), "disbotter".to_string());
         builder.finalize();
     }
 
@@ -215,7 +237,8 @@ impl NodesJSCompiler {
         // Clear the var cache
         self.clear_var_cache();
         // Add interaction key
-        self.add_var("interaction".to_string(), "___INTERACTION___".to_string());
+        self.add_var("interaction".to_string(), "__INTERACTION__".to_string());
+        self.add_var("translations".to_string(), "__TRANSLATIONS__".to_string());
 
         // Compile the start node
         self.compile_node(start_node, flow, builder.clone());
@@ -233,6 +256,60 @@ impl NodesJSCompiler {
         node.call_action(&mut self.engine, builder.clone());
         println!("Compiled node {} ({})", node_type, node_id);
     }
+}
+
+fn expr_shortcut_add_line(context: &mut EvalContext, inputs: &[Expression]) -> Result<Dynamic, Box<EvalAltResult>> {
+    // Replace -> $expr$ with builder.add_line($expr$)
+    let expr = &inputs[0];
+    let expr = context.eval_expression_tree(expr)?;
+    let mut builder = context.scope().get("builder").unwrap().clone().try_cast::<CodeBuilder>().unwrap();
+
+    builder.add_line(expr.into_string().unwrap());
+
+    Ok(Dynamic::from(()))
+}
+
+fn expr_shortcut_set_output(context: &mut EvalContext, inputs: &[Expression]) -> Result<Dynamic, Box<EvalAltResult>> {
+    // Replace $ident$ <- $expr$ with builder.set_output($ident$, $expr$)
+    let ident = inputs[0].get_string_value().unwrap();
+    let expr = &inputs[1];
+    let expr = context.eval_expression_tree(expr)?;
+    let mut builder = context.scope().get("builder").unwrap().clone().try_cast::<CodeBuilder>().unwrap();
+
+    builder.set_output(ident.to_string(), expr.into_string().unwrap());
+
+    Ok(Dynamic::from(()))
+}
+
+pub fn upgrade_engine(engine: &mut Engine) {
+    // CodeBuilder Type
+    engine.build_type::<CodeBuilder>();
+
+    // -> $expr$ syntax as a shorthand for builder.add_line($expr$)
+    engine.register_custom_syntax(
+        ["->", "$expr$"],
+        false,
+        expr_shortcut_add_line
+    ).ok();
+
+    // out name = $expr$ syntax as a shorthand for builder.set_output($expr$)
+    engine.register_custom_syntax(
+        ["out", "$ident$", "=", "$expr$"],
+        false,
+        expr_shortcut_set_output
+    ).ok();
+
+    // inv name as a shorthand for builder.get_input(name)
+    engine.register_custom_syntax(
+        ["inv", "$ident$"],
+        false,
+        |context: &mut EvalContext, inputs: &[Expression]| -> Result<Dynamic, Box<EvalAltResult>> {
+            let ident = inputs[0].get_string_value().unwrap();
+            let mut builder = context.scope().get("builder").unwrap().clone().try_cast::<CodeBuilder>().unwrap();
+
+            Ok(Dynamic::from(builder.get_in_var(ident.to_string())))
+        }
+    ).ok();
 }
 
 #[derive(Clone)]
@@ -315,7 +392,7 @@ impl DisbotterFlow {
 pub struct DisbotterFlowNode {
     uid: String,
     #[serde(rename = "type")]
-    node_type: String,
+    pub(crate) node_type: String,
     #[serde(rename = "inputHardcoded")]
     input_hardcoded: HashMap<String, serde_json::Value>
 }

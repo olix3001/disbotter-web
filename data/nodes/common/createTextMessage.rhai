@@ -20,6 +20,6 @@ const outputs = #{
 };
 
 fn action(builder) {
-    let text = builder.get_input("text");
-    builder.set_output("message", text); 
+    let text = inv text;
+    out message = text;
 }

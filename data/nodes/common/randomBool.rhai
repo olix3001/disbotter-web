@@ -18,6 +18,6 @@ const outputs = #{
 };
 
 fn action(builder) {
-    let true_chance = builder.get_input("true_chance");
-    builder.set_output("result", `Math.random() < ${true_chance}`)
+    let true_chance = inv true_chance;
+    out result = `Math.random() < ${true_chance}`;
 }

@@ -17,5 +17,5 @@ fn main() {
     compiler.add_available_nodes("../data/nodes/common".into());
     compiler.add_available_nodes("../data/nodes/command".into());
     let project = compiler.compile_project();
-    project.debug_print()
+    project.export_to_path("../data/target".into());
 }

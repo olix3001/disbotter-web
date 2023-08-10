@@ -18,8 +18,8 @@ const inputs = #{
 const outputs = #{};
 
 fn action(builder) {
-    let target = builder.get_input("target");
-    let reply = builder.get_input("reply");
+    let target = inv target;
+    let reply = inv reply;
 
-    builder.add_line(`await ${target}.reply(${reply});`)
+    -> `await ${target}.reply(${reply});`
 }

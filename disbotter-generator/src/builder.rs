@@ -1,4 +1,4 @@
-use std::{sync::{Mutex, Arc}, collections::HashMap};
+use std::{sync::{Mutex, Arc}, collections::HashMap, path::PathBuf};
 
 use rhai::CustomType;
 
@@ -41,6 +41,17 @@ impl Program {
             var_cache_stack: Vec::new(),
         }
     }
+
+    /// Export program files to given path
+    pub fn export_to_path(&self, path: PathBuf) {
+        for file in self.files.iter() {
+            let mut file_path = path.clone();
+            file_path.push(&file.lock().unwrap().path);
+            // Ensure that directory exists
+            std::fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+            std::fs::write(file_path, &file.lock().unwrap().code).unwrap();
+        }
+    }
 }
 
 pub struct ProgramFile {
@@ -75,6 +86,14 @@ impl CodeBuilder {
         self.lines.lock().unwrap().drain(..).collect()
     }
 
+    pub(crate) fn increase_ident_by(&mut self, amount: usize) {
+        *self.current_ident.lock().unwrap() += amount;
+    }
+
+    pub(crate) fn decrease_ident_by(&mut self, amount: usize) {
+        *self.current_ident.lock().unwrap() -= amount;
+    }
+
     pub fn clone_empty(&self) -> Self {
         Self {
             lines: Arc::new(Mutex::new(Vec::new())),
@@ -98,7 +117,6 @@ impl CodeBuilder {
     }
 
     pub fn add_lines(&mut self, lines: Vec<String>) {
-        println!("Adding lines: {:?}", lines);
         for line in lines {
             self.add_line(line);
         }
@@ -135,14 +153,15 @@ impl CodeBuilder {
         }
     }
 
-    pub fn get_out_var(&mut self, port: String) -> String {
+    pub fn get_out_var(&mut self, port_key: String) -> String {
         let mut var_cache = self.var_cache.lock().unwrap();
-        let port = PortIdentifier::Output { node_uid: self.current_node_id.clone(), port_key: port };
+        let port = PortIdentifier::Output { node_uid: self.current_node_id.clone(), port_key: port_key.clone() };
+        let nt = self.compiler.current_flow.as_ref().unwrap().get_node(&self.current_node_id).node_type.clone();
 
         if let Some(var) = var_cache.get(&port) {
             return var.clone();
         } else {
-            let vn = NodesJSCompiler::random_var_name();
+            let vn = format!("__io_N{}_O{}_{}", nt, port_key, NodesJSCompiler::random_var_name());
             var_cache.insert(port.clone(), vn.clone());
             return vn;
         }
