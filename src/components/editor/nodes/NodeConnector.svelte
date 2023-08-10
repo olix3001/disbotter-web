@@ -8,7 +8,7 @@
     export let key: string;
     export let color: string = "auto";
     export let type: NodeConnectionType = NodeConnectionType.Any;
-    export let sType: string = "";
+    export let sTags: string[] = [];
     export let port: SVGSVGElement;
     $: style = type === NodeConnectionType.Flow ? "double" : "default";
 
@@ -23,18 +23,22 @@
                     fromKey: null,
                     to: node,
                     toKey: key,
-                    sType
+                    sTags
                 } : {
                     type,
                     from: node,
                     fromKey: key,
                     to: null,
                     toKey: null,
-                    sType
+                    sTags
                 };
                 return p;
             });
         }
+    }
+
+    function satisfiesTags(a: string[], b: string[]) {
+        return b.every((tag) => a.includes(tag));
     }
 
     function stopDrag(e: MouseEvent) {
@@ -43,7 +47,10 @@
             
             if (
                 (cc?.type !== type && cc?.type !== NodeConnectionType.Any) ||
-                (cc?.type == NodeConnectionType.Structure && cc?.sType != sType)
+                (cc?.type == NodeConnectionType.Structure && (
+                    (isEndPort && !satisfiesTags(cc.sTags??[], sTags)) ||
+                    (!isEndPort && !satisfiesTags(sTags, cc.sTags??[]))
+                ))
             ) {
                 PROJECT.update((p) => {
                     p.currentConnection = null;

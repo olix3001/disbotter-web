@@ -2,7 +2,7 @@ use std::{path::PathBuf, collections::{HashMap, BTreeMap}, fs::{self, File}};
 
 use rhai::{Engine, Dynamic};
 
-use crate::builder::CodeBuilder;
+use crate::compiler::upgrade_engine;
 
 pub struct NodeScriptLoader {
     pub engine: Engine,
@@ -18,7 +18,7 @@ pub enum NodeScriptLoadingError {
 impl NodeScriptLoader {
     pub fn new() -> Self {
         let mut engine = Engine::new();
-        engine.build_type::<CodeBuilder>();
+        upgrade_engine(&mut engine);
         Self {
             engine
         }
@@ -84,7 +84,7 @@ impl NodeScriptLoader {
                 .collect::<BTreeMap<String, Dynamic>>();
             let ty = input.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
             let display_name = input.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
-            let struct_type = input.get("struct_type");
+            let struct_tags = input.get("struct_tags");
 
             let default = input.get("start_value");
 
@@ -98,10 +98,11 @@ impl NodeScriptLoader {
                         "struct" => DataType::Structure,
                         _ => DataType::Any,
                     },
-                    struct_type: if struct_type.is_some() {
-                        struct_type.unwrap().clone_cast::<String>()
+                    struct_tags: if struct_tags.is_some() {
+                        let tags = struct_tags.unwrap().clone_cast::<rhai::Array>();
+                        tags.iter().map(|tag| tag.clone_cast::<String>()).collect::<Vec<String>>()
                     } else {
-                        "".to_string()
+                        vec![]
                     }
                 },
                 name: display_name.to_string(),
@@ -116,10 +117,10 @@ impl NodeScriptLoader {
         let outputs = Self::get_variable::<rhai::Map>(&variables, "outputs")?;
         for (name, output) in outputs {
             let output = output.clone().cast::<rhai::Map>();
-            let output = output.iter().map(|(k, v)| (k.to_string(), v.clone_cast())).collect::<HashMap<String, String>>();
-            let ty = output.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?;
-            let display_name = output.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?;
-            let struct_type = output.get("struct_type");
+            let output = output.iter().map(|(k, v)| (k.to_string(), v)).collect::<HashMap<String, &Dynamic>>();
+            let ty = output.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
+            let display_name = output.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
+            let struct_type: Option<&&Dynamic> = output.get("struct_tags");
 
             node.outputs.insert(name.to_string(), NodeIO {
                 ty: NodeIOTy {
@@ -131,7 +132,12 @@ impl NodeScriptLoader {
                         "struct" => DataType::Structure,
                         _ => DataType::Any,
                     },
-                    struct_type: struct_type.unwrap_or(&"".to_string()).to_string()
+                    struct_tags: if struct_type.is_some() {
+                        let tags = struct_type.unwrap().clone_cast::<rhai::Array>();
+                        tags.iter().map(|tag| tag.clone_cast::<String>()).collect::<Vec<String>>()
+                    } else {
+                        vec![]
+                    }
                 },
                 name: display_name.to_string(),
             });
@@ -188,8 +194,8 @@ impl<'a> serde::Deserialize<'a> for DataType {
 pub struct NodeIOTy {
     #[serde(rename = "type")]
     ty: DataType,
-    #[serde(rename = "structType")]
-    struct_type: String
+    #[serde(rename = "structTags")]
+    struct_tags: Vec<String>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -207,6 +213,8 @@ pub fn load_all_nodes(path: PathBuf) -> Vec<Node> {
     for entry in fs::read_dir(path).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
+        let path_s = path.clone();
+        let path_s = path_s.to_str().unwrap_or_default().clone();
 
         if path.is_dir() {
             nodes.extend(load_all_nodes(path));
@@ -214,7 +222,7 @@ pub fn load_all_nodes(path: PathBuf) -> Vec<Node> {
             let extension = path.extension().unwrap_or_default().to_str().unwrap_or_default();
 
             if extension == "rhai" {
-                let node = loader.load(path).unwrap();
+                let node = loader.load(path).expect(format!("Failed to load node script: {:?}", path_s).as_str());
                 nodes.push(node);
             }
         }

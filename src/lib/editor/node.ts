@@ -13,7 +13,7 @@ export interface NodeType {
 }
 
 export type NodeIOType = {
-	[key: string]: { type: { type: NodeConnectionType; structType?: string }; name: string };
+	[key: string]: { type: { type: NodeConnectionType; structTags?: string[] }; name: string };
 };
 export type NodeIO = { [key: string]: any };
 
@@ -60,7 +60,7 @@ export interface ENode {
 
 export interface NodeConnection {
 	type: NodeConnectionType;
-	sType?: string;
+	sTags?: string[];
 
 	from: ENode | null;
 	fromKey: string | null;
@@ -89,7 +89,7 @@ export function flowToJSONParseable(flow: NodeFlow): any {
 		connections: flow.connections.map((conn) => {
 			return {
 				type: conn.type,
-				sType: conn.sType,
+				sTags: conn.sTags,
 				from: conn.from?.uid,
 				fromKey: conn.fromKey,
 				to: conn.to?.uid,
@@ -115,13 +115,13 @@ export function flowFromProjectJSON(data: any, availableNodes: NodeType[]): Node
 
 	for (const conn of data.connections) {
 		const type = conn.type;
-		const sType = conn.sType;
+		const sTags = conn.sTags ?? [];
 		const from = nodes.find((n) => n.uid === conn.from) ?? null;
 		const fromKey = conn.fromKey;
 		const to = nodes.find((n) => n.uid === conn.to) ?? null;
 		const toKey = conn.toKey;
 
-		connections.push({ type, sType, from, fromKey, to, toKey });
+		connections.push({ type, sTags, from, fromKey, to, toKey });
 	}
 
 	return { nodes, connections, availableNodes };

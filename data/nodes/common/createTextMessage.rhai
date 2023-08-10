@@ -15,7 +15,7 @@ const outputs = #{
     message: #{
         name: "Message",
         type: "struct",
-        struct_type: "sendable_message"
+        struct_tags: ["sendable"]
     },
 };
 

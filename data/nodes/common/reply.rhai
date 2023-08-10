@@ -7,12 +7,12 @@ const inputs = #{
     target: #{
         name: "Target",
         type: "struct",
-        struct_type: "discord_interaction"
+        struct_tags: ["replyable"]
     },
     reply: #{
         name: "Reply",
         type: "struct",
-        struct_type: "sendable_message"
+        struct_tags: ["sendable"]
     },
 };
 const outputs = #{};

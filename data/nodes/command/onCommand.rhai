@@ -10,7 +10,7 @@ const outputs = #{
     interaction: #{
         name: "Interaction",
         type: "struct",
-        struct_type: "discord_interaction"
+        struct_tags: ["interaction", "replyable"]
     }
 };
 

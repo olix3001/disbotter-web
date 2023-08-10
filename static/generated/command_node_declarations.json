@@ -8,7 +8,7 @@
       "text": {
         "type": {
           "type": 2,
-          "structType": ""
+          "structTags": []
         },
         "name": "Text"
       }
@@ -17,7 +17,9 @@
       "message": {
         "type": {
           "type": 4,
-          "structType": "sendable_message"
+          "structTags": [
+            "sendable"
+          ]
         },
         "name": "Message"
       }
@@ -30,40 +32,40 @@
     "description": "Branches the flow based on a condition.",
     "category": "Flow Control",
     "inputs": {
-      "condition": {
-        "type": {
-          "type": 3,
-          "structType": ""
-        },
-        "name": "Condition"
-      },
       "__flow_in__": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "flow_in"
+      },
+      "condition": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "Condition"
       }
     },
     "outputs": {
       "__flow_out__": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "flow_out"
       },
       "__flow_if_false": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "If False"
       },
       "__flow_if_true": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "If True"
       }
@@ -76,35 +78,35 @@
     "description": "Generates a random boolean value.",
     "category": "Interaction",
     "inputs": {
-      "__flow_in__": {
-        "type": {
-          "type": 0,
-          "structType": ""
-        },
-        "name": "flow_in"
-      },
       "true_chance": {
         "type": {
           "type": 1,
-          "structType": ""
+          "structTags": []
         },
         "name": "True Chance"
+      },
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
       }
     },
     "outputs": {
-      "__flow_out__": {
-        "type": {
-          "type": 0,
-          "structType": ""
-        },
-        "name": "flow_out"
-      },
       "result": {
         "type": {
           "type": 3,
-          "structType": ""
+          "structTags": []
         },
         "name": "Result"
+      },
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
       }
     },
     "defaultHardcoded": {
@@ -117,24 +119,28 @@
     "description": "Reply to an interaction with a message or embed.",
     "category": "Interaction",
     "inputs": {
-      "target": {
-        "type": {
-          "type": 4,
-          "structType": "discord_interaction"
-        },
-        "name": "Target"
-      },
       "__flow_in__": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "flow_in"
+      },
+      "target": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "replyable"
+          ]
+        },
+        "name": "Target"
       },
       "reply": {
         "type": {
           "type": 4,
-          "structType": "sendable_message"
+          "structTags": [
+            "sendable"
+          ]
         },
         "name": "Reply"
       }
@@ -143,7 +149,7 @@
       "__flow_out__": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "flow_out"
       }
@@ -160,14 +166,17 @@
       "__flow_out__": {
         "type": {
           "type": 0,
-          "structType": ""
+          "structTags": []
         },
         "name": "flow_out"
       },
       "interaction": {
         "type": {
           "type": 4,
-          "structType": "discord_interaction"
+          "structTags": [
+            "interaction",
+            "replyable"
+          ]
         },
         "name": "Interaction"
       }

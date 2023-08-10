@@ -102,7 +102,7 @@
                             bind:port={node.iPorts[input[0]]} 
                             node={node}
                             key={input[0]}
-                            sType={input[1].type.structType}
+                            sTags={input[1].type.structTags}
                             isEndPort
                             />
                         {#if isInputConnected(input[0])}
@@ -134,7 +134,7 @@
                             bind:port={node.oPorts[output[0]]} 
                             node={node}
                             key={output[0]}
-                            sType={output[1].type.structType}
+                            sTags={output[1].type.structTags}
                             />
                     </div>
                 {/if}
