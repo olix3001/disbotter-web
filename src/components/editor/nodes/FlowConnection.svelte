@@ -8,7 +8,7 @@
     export let isCurrent: boolean = false;
 
     function calculateConnectionPath(conn: NodeConnection): string {
-        if (conn?.from && conn?.fromKey && conn?.to && conn?.toKey) {
+        if (conn?.from && conn?.fromKey && conn?.to && conn?.toKey && editor) {
             const parentR = editor.getBoundingClientRect();
             const from = conn.from.oPorts[conn.fromKey]?.getBoundingClientRect();
             const to = conn.to.iPorts[conn.toKey]?.getBoundingClientRect();

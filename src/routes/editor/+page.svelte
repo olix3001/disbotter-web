@@ -11,14 +11,15 @@
 
     let project = writable(new DisbotterProject('New project'));
 
-    function handleMenuClick(e: any) {
+    async function handleMenuClick(e: any) {
         const action = e.detail.action;
         if (action == 'new') {
             $project = new DisbotterProject('New project');
-        }
-
-        if (action == 'save') {
+        } else if (action == 'save') {
             $project.exportToFile();
+        } else if (action == 'open') {
+            await $project.ask_user_open();
+            project.update(p => p);
         }
     }
 </script>

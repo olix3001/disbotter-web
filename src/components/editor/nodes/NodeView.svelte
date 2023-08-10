@@ -51,6 +51,10 @@
     function selectNode() {
         $selectedNodes = [node]
     }
+
+    function isInputConnected(input: string) {
+        return $PROJECT.getCurrentFlow()?.connections.some((c) => c.to === node && c.toKey === input);
+    }
 </script>
 
 <div class="node-view" style={offsetCSS} class:nv-selected={isSelected}>
@@ -101,17 +105,20 @@
                             sType={input[1].type.structType}
                             isEndPort
                             />
-                        <!-- TODO: Don't show inputs if connected -->
-                        {#if input[1].type.type === NodeConnectionType.Number}
-                            <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
-                        {:else if input[1].type.type === NodeConnectionType.Text}
-                            <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
-                        {:else if input[1].type.type === NodeConnectionType.Boolean}
-                            <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
-                            <!-- svelte-ignore a11y-label-has-associated-control -->
-                            <label>{input[1].name}</label>
+                        {#if isInputConnected(input[0])}
+                            <p>{input[1].name}</p>
                         {:else}
-                             <p>{input[1].name}</p>
+                            {#if input[1].type.type === NodeConnectionType.Number}
+                                <input type="number" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]} />
+                            {:else if input[1].type.type === NodeConnectionType.Text}
+                                <input type="text" placeholder={input[1].name} bind:value={node.inputHardcoded[input[0]]}/>
+                            {:else if input[1].type.type === NodeConnectionType.Boolean}
+                                <input type="checkbox" bind:checked={node.inputHardcoded[input[0]]}/>
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label>{input[1].name}</label>
+                            {:else}
+                                <p>{input[1].name}</p>
+                            {/if}
                         {/if}
                     </div>
                 {/if}
@@ -149,6 +156,7 @@
         overflow: hidden;
         position: absolute;
         min-width: 135px;
+        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
     }
 
     .node-view-header {
@@ -249,6 +257,7 @@
         color: #c0c0c0;
         font-weight: 500;
         font-size: xx-small;
+        white-space: nowrap;
     }
 
     .node-view-body {

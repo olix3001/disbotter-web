@@ -7,7 +7,7 @@
 
     function addCommand() {
         PROJECT.update(p => {
-            p.addCommand(new Command('New Command', ''));
+            p.addCommand(new Command('new-command', ''));
             return p;
         });
     }
@@ -31,7 +31,6 @@
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <div class="element" class:selected={$PROJECT.isEditing(command)} on:click={() => setEditing(command)}>
                 <p>{command.name}</p>
-                <p>{command.description}</p>
              </div>
         {:else}
             <p>No commands yet.</p>

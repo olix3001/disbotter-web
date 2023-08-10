@@ -6,7 +6,8 @@ import {
 	type NodeIO,
 	type NodeConnection,
 	type NodeType,
-	flowToJSONParseable
+	flowToJSONParseable,
+	flowFromProjectJSON
 } from './node';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
@@ -147,6 +148,50 @@ export class DisbotterProject {
 
 		document.body.removeChild(element);
 	}
+
+	public import_from_file(data: any): void {
+		// First, deserialize all project metadata
+		this.name = data.metadata.name;
+
+		// Then, deserialize all project content
+		this.commands = data.content.commands.map((commandData: any) => {
+			const command = new Command(commandData.name, commandData.description);
+			command.flow = flowFromProjectJSON(commandData.flow, commandAvailableNodes);
+			return command;
+		});
+
+		// Set the first command as the currently editing one
+		this.currentlyEditing = { type: 'command', command: this.commands[0] };
+	}
+
+	public ask_user_open(): Promise<void> {
+		// Ask the user to open a file
+		const element = document.createElement('input');
+		element.setAttribute('type', 'file');
+		element.setAttribute('accept', '.dbp');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+
+		return new Promise((resolve) => {
+			element.addEventListener('change', () => {
+				const file = element.files?.[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = () => {
+						const data = JSON.parse(reader.result as string);
+						this.import_from_file(data);
+						resolve();
+					};
+					reader.readAsText(file);
+				}
+			});
+		});
+	}
 }
 
 export async function loadNodeDeclarations(file: string): Promise<NodeType[]> {
@@ -159,7 +204,6 @@ let commandAvailableNodes: NodeType[] = [];
 if (typeof document !== 'undefined') {
 	loadNodeDeclarations('/generated/command_node_declarations.json').then((nodes) => {
 		commandAvailableNodes = nodes;
-		console.log(commandAvailableNodes);
 	});
 }
 

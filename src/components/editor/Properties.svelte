@@ -5,9 +5,11 @@
     const PROJECT = getContext<ProjectContext>(projectKey);
 
     let commandName = $PROJECT.currentlyEditing?.command?.name ?? "New command";
+    let commandDesc = $PROJECT.currentlyEditing?.command?.description ?? "";
 
     const unsubscribe = PROJECT.subscribe((p) => {
         commandName = p.currentlyEditing?.command?.name ?? "New command";
+        commandDesc = p.currentlyEditing?.command?.description ?? "";
     });
 
     onDestroy(() => {
@@ -16,6 +18,10 @@
 
     const errors: { [key: string]: { isError: boolean, error: string } } = {
         "command-name": {
+            isError: false,
+            error: ""
+        },
+        "command-desc": {
             isError: false,
             error: ""
         }
@@ -29,12 +35,25 @@
             if (name.length == 0) {
                 errors["command-name"].isError = true;
                 errors["command-name"].error = "Command name cannot be empty.";
-                p.currentlyEditing.command.name = "New Command";
+                p.currentlyEditing.command.name = "new-command";
+            } else if (!name.match(/[a-z][a-z0-9-]+$/)) {
+                errors["command-name"].isError = true;
+                errors["command-name"].error = "Command name can only contain lowercase letters, numbers and dashes."; 
             } else {
                 errors["command-name"].isError = false;
                 errors["command-name"].error = "";
                 p.currentlyEditing.command.name = (e.target as HTMLInputElement).value;
             }
+
+            return p;
+        });
+    }
+
+    function updateCommandDesc(e: Event) {
+        PROJECT.update((p) => {
+            if (p.currentlyEditing?.command == undefined) return p;
+
+            p.currentlyEditing.command.description = (e.target as HTMLInputElement).value;
 
             return p;
         });
@@ -53,6 +72,11 @@
                 <label for="props-command-name">Command Name</label>
                 <input name="props-command-name" type="text" on:input={updateCommandName} bind:value={commandName} />
                 <p>{errors['command-name'].error}</p>
+            </div>
+            <div class:error={errors['command-desc'].isError}>
+                <label for="props-command-desc">description</label>
+                <input name="props-command-desc" type="text" on:input={updateCommandDesc} bind:value={commandDesc} />
+                <p>{errors['command-desc'].error}</p>
             </div>
         </div>
     {/if}

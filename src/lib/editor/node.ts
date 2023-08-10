@@ -98,3 +98,31 @@ export function flowToJSONParseable(flow: NodeFlow): any {
 		})
 	};
 }
+
+export function flowFromProjectJSON(data: any, availableNodes: NodeType[]): NodeFlow {
+	const nodes: ENode[] = [];
+	const connections: NodeConnection[] = [];
+
+	for (const node of data.nodes) {
+		const type = availableNodes.find((n) => n.id === node.type) ?? availableNodes[0];
+		const x = node.x;
+		const y = node.y;
+		const uid = node.uid;
+		const inputHardcoded = node.inputHardcoded;
+
+		nodes.push({ type, x, y, uid, inputHardcoded, iPorts: {}, oPorts: {} });
+	}
+
+	for (const conn of data.connections) {
+		const type = conn.type;
+		const sType = conn.sType;
+		const from = nodes.find((n) => n.uid === conn.from) ?? null;
+		const fromKey = conn.fromKey;
+		const to = nodes.find((n) => n.uid === conn.to) ?? null;
+		const toKey = conn.toKey;
+
+		connections.push({ type, sType, from, fromKey, to, toKey });
+	}
+
+	return { nodes, connections, availableNodes };
+}
