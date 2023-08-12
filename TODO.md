@@ -3,10 +3,10 @@
 - [x] Basic node editor
 - [x] Compilation to JS
 - [x] Easy way to add new nodes
-- [ ] CLI tool for compiling
-- [ ] Meaningful error messages
+- [x] CLI tool for compiling
+- [x] Meaningful error messages (CLI)
+- [x] Comment the code
 - [ ] Command options
-- [ ] Comment the code
 
 # Alpha
 
@@ -17,6 +17,7 @@
 - [ ] End-to-end tests
 - [ ] Node documentation
 - [ ] Connection to backend
+- [ ] Error messages in the editor
 
 # Beta
 

@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 description = "Code generator for disbotter"
 
+[[bin]]
+name = "disbotter"
+path = "src/main.rs"
+
 [dependencies]
 clap = { version = "4.3.21", features = ["derive"] }
 colored = "2.0.4"

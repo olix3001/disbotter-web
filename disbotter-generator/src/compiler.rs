@@ -42,6 +42,7 @@ pub enum CompilerError {
     RhaiError(Box<EvalAltResult>),
     InvalidPortIdentifier(PortIdentifier),
     NodeNotFound(String),
+    NoStartNode,
 }
 
 impl CompilerError {
@@ -55,6 +56,9 @@ impl CompilerError {
             },
             CompilerError::NodeNotFound(node_id) => {
                 format!("{}: {}", "Node not found".red(), node_id)
+            }
+            CompilerError::NoStartNode => {
+                format!("{}: {}", "No start node".red(), "No start node found")
             }
         }
     }
@@ -310,9 +314,11 @@ impl NodesJSCompiler {
     pub fn compile_flow(&mut self, flow: &DisbotterFlow, mut builder: CodeBuilder, start_node_id: &str) -> Result<(), CompilerError> {
         builder.compiler.current_flow = Some(flow.clone());
         // Find the start node
-        let start_node = flow.nodes.iter().find(|n| n.node_type == start_node_id).expect(
-            "Every flow needs a start node"
-        );
+        let start_node = flow.nodes.iter().find(|n| n.node_type == start_node_id);
+        if start_node.is_none() {
+            return Err(CompilerError::NoStartNode);
+        }
+        let start_node = start_node.unwrap();
         // Clear the var cache
         self.clear_var_cache();
         // Add interaction key
@@ -339,7 +345,7 @@ impl NodesJSCompiler {
         let node = node.unwrap();
         builder.current_node_id = node_id.clone();
         node.call_action(&mut self.engine, builder.clone())?;
-        println!("{} {}", "Compiled node ".green(), node_id);
+        println!("{} {} ({})", "Compiled node".green(), node.id, node_id);
 
         Ok(())
     }
