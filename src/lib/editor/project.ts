@@ -3,7 +3,6 @@ import {
 	NodeConnectionType,
 	type ENode,
 	type NodeFlow,
-	type NodeIO,
 	type NodeConnection,
 	type NodeType,
 	flowToJSONParseable,
