@@ -48,7 +48,8 @@ fn main() {
                 println!("{:?}", err);
                 vec![]
             })).collect();
-            export_node_declarations(nodes, output.into());
+            export_node_declarations(nodes, output.clone().into());
+            println!("{} {}", "Successfully generated node declarations:".green(), output.yellow());
         },
         Some(Commands::Compile { path, output, nodes }) => {
             // If command is to compile a project

@@ -1,30 +1,449 @@
 [
   {
-    "id": "_builtin_create_text_message",
-    "title": "Create Text Message",
-    "description": "Create a message from the given text.",
+    "id": "_builtin_get_command_interaction",
+    "title": "Get Interaction",
+    "description": "Gets the interaction that triggered the command.",
     "category": "Interaction",
+    "inputs": {},
+    "outputs": {
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "interaction",
+            "replyable"
+          ]
+        },
+        "name": "interaction"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "__start__",
+    "title": "On Command",
+    "description": "Triggered when a command is executed.",
+    "category": "Events",
+    "inputs": {},
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_channel_break",
+    "title": "Break Text Channel",
+    "description": "Break text channel into its component parts.",
+    "category": "Utility",
     "inputs": {
-      "text": {
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "text_channel",
+            "channel"
+          ]
+        },
+        "name": "channel"
+      }
+    },
+    "outputs": {
+      "guild": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "guild"
+          ]
+        },
+        "name": "guild"
+      },
+      "id": {
+        "type": {
+          "type": 5,
+          "structTags": [
+            "id"
+          ]
+        },
+        "name": "id"
+      },
+      "name": {
+        "type": {
+          "type": 5,
+          "structTags": [
+            "name"
+          ]
+        },
+        "name": "name"
+      },
+      "nsfw": {
+        "type": {
+          "type": 3,
+          "structTags": [
+            "nsfw"
+          ]
+        },
+        "name": "nsfw"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_interaction_break",
+    "title": "Break Interaction",
+    "description": "Break up an interaction into its components.",
+    "category": "Utility",
+    "inputs": {
+      "interaction": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "interaction"
+          ]
+        },
+        "name": "interaction"
+      }
+    },
+    "outputs": {
+      "guild": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "guild"
+          ]
+        },
+        "name": "guild"
+      },
+      "channel": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "channel",
+            "guild_channel",
+            "message_sendable",
+            "text_channel"
+          ]
+        },
+        "name": "channel"
+      },
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "member",
+            "user_resolvable"
+          ]
+        },
+        "name": "member"
+      },
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user",
+            "user_resolvable"
+          ]
+        },
+        "name": "user"
+      },
+      "ephemeral": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "ephemeral"
+      },
+      "deferred": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "deferred"
+      },
+      "replied": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "replied"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_member_break",
+    "title": "Break Member",
+    "description": "Break member into its components.",
+    "category": "Utility",
+    "inputs": {
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "member"
+      }
+    },
+    "outputs": {
+      "bannable": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "bannable"
+      },
+      "kickable": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "kickable"
+      },
+      "dm_channel": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "DM channel"
+      },
+      "guild": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "guild"
+      },
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": []
+        },
+        "name": "user"
+      },
+      "id": {
         "type": {
           "type": 2,
           "structTags": []
         },
-        "name": "text"
-      }
-    },
-    "outputs": {
-      "message": {
+        "name": "id"
+      },
+      "nickname": {
         "type": {
-          "type": 4,
-          "structTags": [
-            "sendable"
-          ]
+          "type": 2,
+          "structTags": []
         },
-        "name": "message"
+        "name": "nickname"
       }
     },
     "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_user_break",
+    "title": "Break User",
+    "description": "Break user into its component parts.",
+    "category": "Utility",
+    "inputs": {
+      "user": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user"
+          ]
+        },
+        "name": "user"
+      }
+    },
+    "outputs": {
+      "bot": {
+        "type": {
+          "type": 3,
+          "structTags": []
+        },
+        "name": "bot"
+      },
+      "discriminator": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "discriminator"
+      },
+      "id": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "id"
+      },
+      "username": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "username"
+      },
+      "tag": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "tag"
+      },
+      "dm_channel": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "channel",
+            "dm_channel",
+            "message_sendable"
+          ]
+        },
+        "name": "DM channel"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_action_ban",
+    "title": "Ban Member",
+    "description": "Ban a member from the server.",
+    "category": "Actions",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user_resolvable"
+          ]
+        },
+        "name": "user"
+      },
+      "reason": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "reason"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {
+      "reason": "No reason provided."
+    }
+  },
+  {
+    "id": "_builtin_action_kick",
+    "title": "Kick Member",
+    "description": "Kick a member from the server.",
+    "category": "Actions",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "user_resolvable"
+          ]
+        },
+        "name": "user"
+      },
+      "reason": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "reason"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {
+      "reason": "No reason provided."
+    }
+  },
+  {
+    "id": "_builtin_action_timeout",
+    "title": "Timeout Member",
+    "description": "Timeout a member from the server. (duration is in milliseconds)",
+    "category": "Actions",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "duration": {
+        "type": {
+          "type": 1,
+          "structTags": []
+        },
+        "name": "duration"
+      },
+      "member": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "member"
+          ]
+        },
+        "name": "member"
+      },
+      "reason": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "reason"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {
+      "duration": 3600000,
+      "reason": "No reason provided"
+    }
   },
   {
     "id": "_builtin_flow_if",
@@ -112,6 +531,126 @@
     "defaultHardcoded": {
       "n": 1
     }
+  },
+  {
+    "id": "_builtin_create_text_message",
+    "title": "Create Text Message",
+    "description": "Create a message from the given text.",
+    "category": "Interaction",
+    "inputs": {
+      "text": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "text"
+      }
+    },
+    "outputs": {
+      "message": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "sendable"
+          ]
+        },
+        "name": "message"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_interaction_reply",
+    "title": "Reply",
+    "description": "Reply to an interaction with a message or embed.",
+    "category": "Interaction",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "target": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "replyable"
+          ]
+        },
+        "name": "target"
+      },
+      "reply": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "sendable"
+          ]
+        },
+        "name": "reply"
+      },
+      "ephemeral": {
+        "type": {
+          "type": 5,
+          "structTags": []
+        },
+        "name": "ephemeral"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_message_send",
+    "title": "Send Message",
+    "description": "Send a message to specified target.",
+    "category": "Interaction",
+    "inputs": {
+      "__flow_in__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_in"
+      },
+      "target": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "replyable"
+          ]
+        },
+        "name": "target"
+      },
+      "message": {
+        "type": {
+          "type": 4,
+          "structTags": [
+            "sendable"
+          ]
+        },
+        "name": "message"
+      }
+    },
+    "outputs": {
+      "__flow_out__": {
+        "type": {
+          "type": 0,
+          "structTags": []
+        },
+        "name": "flow_out"
+      }
+    },
+    "defaultHardcoded": {}
   },
   {
     "id": "_builtin_math_add_numbers",
@@ -762,44 +1301,18 @@
     "defaultHardcoded": {}
   },
   {
-    "id": "_builtin_interaction_reply",
-    "title": "Reply",
-    "description": "Reply to an interaction with a message or embed.",
-    "category": "Interaction",
-    "inputs": {
-      "__flow_in__": {
-        "type": {
-          "type": 0,
-          "structTags": []
-        },
-        "name": "flow_in"
-      },
-      "target": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "replyable"
-          ]
-        },
-        "name": "Target"
-      },
-      "reply": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "sendable"
-          ]
-        },
-        "name": "Reply"
-      }
-    },
+    "id": "_builtin_constant_null",
+    "title": "Null",
+    "description": "",
+    "category": "Constants",
+    "inputs": {},
     "outputs": {
-      "__flow_out__": {
+      "result": {
         "type": {
-          "type": 0,
+          "type": 5,
           "structTags": []
         },
-        "name": "flow_out"
+        "name": "value"
       }
     },
     "defaultHardcoded": {}
@@ -832,6 +1345,31 @@
           "structTags": []
         },
         "name": "result"
+      }
+    },
+    "defaultHardcoded": {}
+  },
+  {
+    "id": "_builtin_text_constant",
+    "title": "Constant text",
+    "description": "Constant text.",
+    "category": "Text",
+    "inputs": {
+      "text": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "text"
+      }
+    },
+    "outputs": {
+      "result": {
+        "type": {
+          "type": 2,
+          "structTags": []
+        },
+        "name": "value"
       }
     },
     "defaultHardcoded": {}
@@ -974,246 +1512,6 @@
           "structTags": []
         },
         "name": "flow_out"
-      }
-    },
-    "defaultHardcoded": {}
-  },
-  {
-    "id": "_builtin_get_command_interaction",
-    "title": "Get Interaction",
-    "description": "Gets the interaction that triggered the command.",
-    "category": "Interaction",
-    "inputs": {},
-    "outputs": {
-      "interaction": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "interaction",
-            "replyable"
-          ]
-        },
-        "name": "interaction"
-      }
-    },
-    "defaultHardcoded": {}
-  },
-  {
-    "id": "__start__",
-    "title": "On Command",
-    "description": "Triggered when a command is executed.",
-    "category": "Events",
-    "inputs": {},
-    "outputs": {
-      "__flow_out__": {
-        "type": {
-          "type": 0,
-          "structTags": []
-        },
-        "name": "flow_out"
-      }
-    },
-    "defaultHardcoded": {}
-  },
-  {
-    "id": "_builtin_interaction_break",
-    "title": "Break Interaction",
-    "description": "Break up an interaction into its components.",
-    "category": "Utility",
-    "inputs": {
-      "interaction": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "interaction"
-          ]
-        },
-        "name": "interaction"
-      }
-    },
-    "outputs": {
-      "guild": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "guild"
-          ]
-        },
-        "name": "guild"
-      },
-      "channel": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "channel",
-            "guild_channel"
-          ]
-        },
-        "name": "channel"
-      },
-      "member": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "member"
-          ]
-        },
-        "name": "member"
-      },
-      "user": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "user"
-          ]
-        },
-        "name": "user"
-      },
-      "ephemeral": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "ephemeral"
-      },
-      "deferred": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "deferred"
-      },
-      "replied": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "replied"
-      }
-    },
-    "defaultHardcoded": {}
-  },
-  {
-    "id": "_builtin_member_break",
-    "title": "Break Member",
-    "description": "Break member into its components.",
-    "category": "Utility",
-    "inputs": {
-      "member": {
-        "type": {
-          "type": 4,
-          "structTags": []
-        },
-        "name": "member"
-      }
-    },
-    "outputs": {
-      "bannable": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "bannable"
-      },
-      "kickable": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "kickable"
-      },
-      "dm_channel": {
-        "type": {
-          "type": 4,
-          "structTags": []
-        },
-        "name": "DM channel"
-      },
-      "guild": {
-        "type": {
-          "type": 4,
-          "structTags": []
-        },
-        "name": "guild"
-      },
-      "user": {
-        "type": {
-          "type": 4,
-          "structTags": []
-        },
-        "name": "user"
-      },
-      "id": {
-        "type": {
-          "type": 2,
-          "structTags": []
-        },
-        "name": "id"
-      },
-      "nickname": {
-        "type": {
-          "type": 2,
-          "structTags": []
-        },
-        "name": "nickname"
-      }
-    },
-    "defaultHardcoded": {}
-  },
-  {
-    "id": "_builtin_user_break",
-    "title": "Break User",
-    "description": "Break user into its component parts.",
-    "category": "Utility",
-    "inputs": {
-      "user": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "user"
-          ]
-        },
-        "name": "user"
-      }
-    },
-    "outputs": {
-      "bot": {
-        "type": {
-          "type": 3,
-          "structTags": []
-        },
-        "name": "bot"
-      },
-      "discriminator": {
-        "type": {
-          "type": 2,
-          "structTags": []
-        },
-        "name": "discriminator"
-      },
-      "username": {
-        "type": {
-          "type": 2,
-          "structTags": []
-        },
-        "name": "username"
-      },
-      "tag": {
-        "type": {
-          "type": 2,
-          "structTags": []
-        },
-        "name": "tag"
-      },
-      "dm_channel": {
-        "type": {
-          "type": 4,
-          "structTags": [
-            "channel",
-            "dm_channel"
-          ]
-        },
-        "name": "DM channel"
       }
     },
     "defaultHardcoded": {}

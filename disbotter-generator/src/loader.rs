@@ -1,6 +1,6 @@
 use std::{path::PathBuf, collections::{HashMap, BTreeMap}, fs::{self, File}, hash::Hash, fmt::{Debug, Formatter}};
 
-use rhai::{Engine, Dynamic};
+use rhai::{Engine, Dynamic, EvalAltResult};
 use serde::ser::SerializeMap;
 
 use crate::compiler::upgrade_engine;
@@ -15,9 +15,9 @@ pub struct NodeScriptLoader {
 /// All possible errors that can occur while loading a node script
 #[derive(Debug)]
 pub enum NodeScriptLoadingError {
-    InvalidScript,
+    InvalidScript(PathBuf, Box<EvalAltResult>),
     MissingValue(String),
-    InvalidIODeclaration
+    InvalidIODeclaration(PathBuf, &'static str),
 }
 
 impl NodeScriptLoader {
@@ -42,10 +42,10 @@ impl NodeScriptLoader {
     /// Loads a node from a script file
     pub fn load(&mut self, script: PathBuf) -> Result<Node, NodeScriptLoadingError> {
         // Compile script into AST
-        let ast = self.engine.compile_file(script);
+        let ast = self.engine.compile_file(script.clone());
 
-        if let Err(_) = ast {
-            return Err(NodeScriptLoadingError::InvalidScript);
+        if let Err(e) = ast {
+            return Err(NodeScriptLoadingError::InvalidScript(script, e));
         }
 
         let ast = ast.unwrap();
@@ -95,8 +95,8 @@ impl NodeScriptLoader {
             let input = input.iter()
                 .map(|(name, value)| (name.to_string(), value.clone_cast()))
                 .collect::<BTreeMap<String, Dynamic>>();
-            let ty = input.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
-            let display_name = input.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
+            let ty = input.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration(script.clone(), "Input type missing"))?.clone_cast::<String>();
+            let display_name = input.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration(script.clone(), "Input name missing"))?.clone_cast::<String>();
             let struct_tags = input.get("struct_tags");
 
             let default = input.get("start_value");
@@ -143,8 +143,8 @@ impl NodeScriptLoader {
         for (name, output) in outputs {
             let output = output.clone().cast::<rhai::Map>();
             let output = output.iter().map(|(k, v)| (k.to_string(), v)).collect::<HashMap<String, &Dynamic>>();
-            let ty = output.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
-            let display_name = output.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration)?.clone_cast::<String>();
+            let ty = output.get("type").ok_or(NodeScriptLoadingError::InvalidIODeclaration(script.clone(), "Output type missing"))?.clone_cast::<String>();
+            let display_name = output.get("name").ok_or(NodeScriptLoadingError::InvalidIODeclaration(script.clone(), "Output name missing"))?.clone_cast::<String>();
             let struct_type: Option<&&Dynamic> = output.get("struct_tags");
 
             let index = output.get("index");

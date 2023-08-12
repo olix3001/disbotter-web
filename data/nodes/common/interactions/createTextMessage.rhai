@@ -22,4 +22,5 @@ const outputs = #{
 fn action(builder) {
     let text = inv text;
     out message = text;
+    builder.set_comp_time_data("message", "type", "text");
 }

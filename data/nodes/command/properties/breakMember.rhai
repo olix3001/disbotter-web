@@ -26,7 +26,7 @@ const outputs = #{
     dm_channel: #{
         name: "DM channel",
         type: "struct",
-        structTags: ["channel", "dm_channel"],
+        structTags: ["channel", "dm_channel", "message_sendable"],
         index: 2
     },
     guild: #{
@@ -38,7 +38,7 @@ const outputs = #{
     user: #{
         name: "user",
         type: "struct",
-        structTags: ["user"],
+        structTags: ["user", "user_resolvable"],
         index: 4
     },
     id: #{

@@ -5,23 +5,33 @@ const category = "Interaction";
 
 const inputs = #{
     target: #{
-        name: "Target",
+        name: "target",
         type: "struct",
         struct_tags: ["replyable"],
         index: 0
     },
     reply: #{
-        name: "Reply",
+        name: "reply",
         type: "struct",
         struct_tags: ["sendable"],
         index: 1
     },
+    ephemeral: #{
+        name: "ephemeral",
+        type: "bool",
+        index: 2
+    }
 };
 const outputs = #{};
 
 fn action(builder) {
     let target = inv target;
     let reply = inv reply;
+    let ephemeral = inv ephemeral;
 
-    -> `await ${target}.reply(${reply});`
+    let type = builder.get_comp_time_data("reply", "type");
+
+    if type == "text" {
+        -> `await ${target}.reply({ content: ${reply}, ephemeral: ${ephemeral}});`
+    }
 }

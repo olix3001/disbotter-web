@@ -155,20 +155,17 @@ export class DisbotterProject {
 
 		// Then, deserialize all project content
 		this.commands = data.content.commands.map((commandData: any) => {
-			const command = new Command(
-				commandData.name,
-				commandData.description,
-				commandData.options.map(
-					(optionData: any) =>
-						new CommandOption(
-							optionData.name,
-							optionData.description,
-							optionData.type,
-							optionData.required,
-							optionData.choices
-						)
-				)
-			);
+			const command = new Command(commandData.name, commandData.description);
+			commandData.options.forEach((optionData: any) => {
+				const option = new CommandOption(
+					optionData.name,
+					optionData.description,
+					optionData.type,
+					optionData.required,
+					optionData.choices
+				);
+				command.addOption(option);
+			});
 			command.flow = flowFromProjectJSON(commandData.flow, commandAvailableNodes);
 			return command;
 		});
@@ -411,8 +408,11 @@ function optionTypeToNodeType(type: CommandOptionType): {
 		case CommandOptionType.String:
 			return { type: NodeConnectionType.Text };
 		case CommandOptionType.User:
-			return { type: NodeConnectionType.Structure, structTags: ['user'] };
+			return { type: NodeConnectionType.Structure, structTags: ['user', 'user_resolvable'] };
 		case CommandOptionType.Channel:
-			return { type: NodeConnectionType.Structure, structTags: ['channel', 'guild_channel'] };
+			return {
+				type: NodeConnectionType.Structure,
+				structTags: ['channel', 'guild_channel', 'text_channel']
+			};
 	}
 }

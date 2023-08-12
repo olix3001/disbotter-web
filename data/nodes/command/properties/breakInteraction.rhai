@@ -22,19 +22,19 @@ const outputs = #{
     channel: #{
         name: "channel",
         type: "struct",
-        struct_tags: ["channel", "guild_channel"],
+        struct_tags: ["channel", "guild_channel", "message_sendable", "text_channel"],
         index: 1
     },
     member: #{
         name: "member",
         type: "struct",
-        struct_tags: ["member"],
+        struct_tags: ["member", "user_resolvable"],
         index: 2
     },
     user: #{
         name: "user",
         type: "struct",
-        struct_tags: ["user"],
+        struct_tags: ["user", "user_resolvable"],
         index: 3
     },
     ephemeral: #{

@@ -41,7 +41,7 @@ const outputs = #{
     dm_channel: #{
         name: "DM channel",
         type: "struct",
-        struct_tags: ["channel", "dm_channel"],
+        struct_tags: ["channel", "dm_channel", "message_sendable"],
         index: 5
     },
 };

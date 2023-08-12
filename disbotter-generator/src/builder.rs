@@ -137,6 +137,10 @@ impl CodeBuilder {
         );
     }
 
+    pub fn add_on_top(&mut self, line: String) {
+        self.lines.lock().unwrap().insert(0, line);
+    }
+
     pub fn get_in_var(&mut self, port_name: String) -> String {
         let var_cache = self.var_cache.lock().unwrap();
         let port = PortIdentifier::Input { node_uid: self.current_node_id.clone(), port_key: port_name.clone() };
@@ -150,6 +154,33 @@ impl CodeBuilder {
         } else {
             return "undefined".to_string();
         }
+    }
+    
+    pub fn get_comp_time_data(&mut self, port_key: String, data_key: String) -> String {
+        let var_cache = self.var_cache.lock().unwrap();
+        // Get whatever this port is connected to
+        let port = PortIdentifier::Input { node_uid: self.current_node_id.clone(), port_key: port_key.clone() };
+        let port = self.compiler.get_flow_target(self.compiler.current_flow.as_ref().unwrap(), port).unwrap();
+
+        // Convert port to comp time data
+        let port = match port {
+            PortIdentifier::Output { node_uid, port_key } => {
+                PortIdentifier::CompTime { node_uid, port_key, data_key }
+            },
+            _ => unreachable!()
+        };
+
+        if let Some(var) = var_cache.get(&port) {
+            return var.clone();
+        } else {
+            return "undefined".to_string();
+        }
+    }
+
+    pub fn set_comp_time_data(&mut self, port_key: String, data_key: String, data: String) {
+        let mut var_cache = self.var_cache.lock().unwrap();
+        let port = PortIdentifier::CompTime { node_uid: self.current_node_id.clone(), port_key: port_key.clone(), data_key: data_key.clone() };
+        var_cache.insert(port, data);
     }
 
     pub fn get_out_var(&mut self, port_key: String) -> String {
@@ -230,6 +261,8 @@ impl CustomType for CodeBuilder {
             .with_fn("map_io", Self::map_io)
             .with_fn("push_stack", Self::push_stack)
             .with_fn("pop_stack", Self::pop_stack)
+            .with_fn("get_comp_time_data", Self::get_comp_time_data)
+            .with_fn("set_comp_time_data", Self::set_comp_time_data)
             .with_fn("get_random_var_name", Self::get_random_var_name)
             .with_fn("compile_flow_output_here", Self::compile_flow_output_here);
     }

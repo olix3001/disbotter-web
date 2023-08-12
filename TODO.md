@@ -6,7 +6,7 @@
 - [x] CLI tool for compiling
 - [x] Meaningful error messages (CLI)
 - [x] Comment the code
-- [ ] Command options
+- [x] Command options
 
 # Alpha
 
@@ -18,6 +18,7 @@
 - [ ] Node documentation
 - [ ] Connection to backend
 - [ ] Error messages in the editor
+- [ ] Automatically generate nodes from discord.js (not sure if possible)
 
 # Beta
 
