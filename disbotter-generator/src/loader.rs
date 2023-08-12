@@ -5,10 +5,14 @@ use serde::ser::SerializeMap;
 
 use crate::compiler::upgrade_engine;
 
+/// This struct is responsible for loading node metadata from a script file
+/// and converting it to a .json file that can be used by the web editor
 pub struct NodeScriptLoader {
+    /// RHAI engine used to load the script
     pub engine: Engine,
 }
 
+/// All possible errors that can occur while loading a node script
 #[derive(Debug)]
 pub enum NodeScriptLoadingError {
     InvalidScript,
@@ -17,6 +21,7 @@ pub enum NodeScriptLoadingError {
 }
 
 impl NodeScriptLoader {
+    /// Creates a new NodeScriptLoader
     pub fn new() -> Self {
         let mut engine = Engine::new();
         upgrade_engine(&mut engine);
@@ -25,6 +30,7 @@ impl NodeScriptLoader {
         }
     }
 
+    /// Gets a variable from a HashMap, returning an error if it doesn't exist
     fn get_variable<'a, T: Clone + 'static>(variables: &'a HashMap<String, rhai::Dynamic>, name: &str) -> Result<T, NodeScriptLoadingError> {
         if let Some(value) = variables.get(name) {
             return Ok(value.clone_cast())
@@ -33,7 +39,9 @@ impl NodeScriptLoader {
         Err(NodeScriptLoadingError::MissingValue(name.to_string()))
     }
 
+    /// Loads a node from a script file
     pub fn load(&mut self, script: PathBuf) -> Result<Node, NodeScriptLoadingError> {
+        // Compile script into AST
         let ast = self.engine.compile_file(script);
 
         if let Err(_) = ast {
@@ -42,10 +50,12 @@ impl NodeScriptLoader {
 
         let ast = ast.unwrap();
 
+        // Get all constant variables
         let variables = ast.iter_literal_variables(true, false)
             .map(|(name, _, value)| (name.to_string(), value.clone()))
             .collect::<HashMap<String, rhai::Dynamic>>();
 
+        // Create node based on variables
         let mut node = Node {
             id: Self::get_variable(&variables, "id")?,
             title: Self::get_variable(&variables, "title")?,
@@ -56,7 +66,7 @@ impl NodeScriptLoader {
             default_hardcoded: HashMap::new(),
         };
 
-        // Add flow io
+        // Add flow I/O
         if !variables.contains_key("noFlowIn") && !variables.contains_key("pure") {
             node.inputs.insert("__flow_in__".to_string(), NodeIO {
                 ty: NodeIOTy {
@@ -173,6 +183,7 @@ impl NodeScriptLoader {
     }
 }
 
+/// Custom map type that preserves insertion order
 pub struct KeyMap<K, V> {
     pub keys: Vec<K>,
     pub values: HashMap<K, V>,
@@ -206,6 +217,7 @@ impl<K, V> Debug for KeyMap<K, V> where K: Debug, V: Debug {
 }
 
 impl<K, V> KeyMap<K, V> where K: Clone + Hash + Eq {
+    /// Returns a new KeyMap based on the given map, and a map of keys to their insertion order
     pub fn from_map_and_keymap(map: HashMap<K, V>, keymap: HashMap<K, usize>) -> Self {
         let mut keys = keymap.into_iter().collect::<Vec<(K, usize)>>();
         keys.sort_by(|(_, a), (_, b)| a.cmp(b));
@@ -228,6 +240,7 @@ impl<K, V> KeyMap<K, V> where K: Clone + Hash + Eq {
         self.values.insert(key, value);
     }
 
+    /// Extends the KeyMap with the given map and keymap
     pub fn extend_from_map_and_keymap(&mut self, map: HashMap<K, V>, keymap: HashMap<K, usize>) {
         let mut keys = keymap.into_iter().collect::<Vec<(K, usize)>>();
         keys.sort_by(|(_, a), (_, b)| a.cmp(b));
@@ -295,32 +308,32 @@ pub struct NodeIO {
     name: String,
 }
 
-pub fn load_all_nodes(path: PathBuf) -> Vec<Node> {
-    let mut nodes = Vec::new();
+/// Loads all nodes from the given path and its subdirectories
+pub fn load_all_nodes(path: PathBuf) -> Result<Vec<Node>, NodeScriptLoadingError> {
+    let mut nodes: Vec<Node> = Vec::new();
 
     let mut loader = NodeScriptLoader::new();
 
     for entry in fs::read_dir(path).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
-        let path_s = path.clone();
-        let path_s = path_s.to_str().unwrap_or_default().clone();
-
+        
         if path.is_dir() {
-            nodes.extend(load_all_nodes(path));
+            nodes.extend(load_all_nodes(path)?);
         } else {
             let extension = path.extension().unwrap_or_default().to_str().unwrap_or_default();
 
             if extension == "rhai" {
-                let node = loader.load(path).expect(format!("Failed to load node script: {:?}", path_s).as_str());
+                let node = loader.load(path)?;
                 nodes.push(node);
             }
         }
     }
 
-    nodes
+    Ok(nodes)
 }
 
+/// Exports the given nodes to the given path
 pub fn export_node_declarations(nodes: Vec<Node>, target_path: PathBuf) {
     fs::create_dir_all(target_path.parent().unwrap()).unwrap();
     let file = File::create(target_path).unwrap();

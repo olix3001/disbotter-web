@@ -1,9 +1,11 @@
-use std::{collections::HashMap, path::PathBuf, sync::{Arc, Mutex}};
-
+use std::{collections::HashMap, path::PathBuf, sync::{Arc, Mutex}, fmt::{Display, Debug}};
 use rhai::{Engine, Scope, EvalContext, Expression, EvalAltResult, Dynamic};
+use colored::*;
 
 use crate::builder::{CodeBuilder, Program};
 
+/// Represents a port on a node, it consists of a node uid and a port key
+/// There are also global ports, which are just a key
 #[derive(Debug, serde::Serialize, serde::Deserialize, Eq, PartialEq, Hash, Clone)]
 pub enum PortIdentifier {
     Input {
@@ -25,6 +27,7 @@ impl Clone for NodesJSCompiler {
     }
 }
 
+/// Compiler for the nodes
 pub struct NodesJSCompiler {
     available_nodes: HashMap<String, AvailableNode>,
     project: Arc<DisbotterProjectData>,
@@ -34,7 +37,53 @@ pub struct NodesJSCompiler {
     pub current_flow: Option<DisbotterFlow>,
 }
 
+/// all possible errors that can occur during compilation
+pub enum CompilerError {
+    RhaiError(Box<EvalAltResult>),
+    InvalidPortIdentifier(PortIdentifier),
+    NodeNotFound(String),
+}
+
+impl CompilerError {
+    pub fn to_pretty(&self) -> String {
+        match self {
+            CompilerError::RhaiError(err) => {
+                format!("{}: {}", "Rhai error".red(), err)
+            },
+            CompilerError::InvalidPortIdentifier(port) => {
+                format!("{}: {}", "Invalid port identifier".red(), port)
+            },
+            CompilerError::NodeNotFound(node_id) => {
+                format!("{}: {}", "Node not found".red(), node_id)
+            }
+        }
+    }
+}
+
+impl Debug for CompilerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_pretty())
+    }
+}
+
+impl Display for PortIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PortIdentifier::Input { node_uid, port_key } => {
+                write!(f, "Input: {} -> {}", node_uid, port_key)
+            },
+            PortIdentifier::Output { node_uid, port_key } => {
+                write!(f, "Output: {} -> {}", node_uid, port_key)
+            },
+            PortIdentifier::Global { key } => {
+                write!(f, "Global: {}", key)
+            }
+        }
+    }
+}
+
 impl NodesJSCompiler {
+    /// Create a new compiler
     pub fn new(project: DisbotterProjectData) -> NodesJSCompiler {
         let mut engine = Engine::new();
         upgrade_engine(&mut engine);
@@ -49,6 +98,8 @@ impl NodesJSCompiler {
         }
     }
 
+    /// Clones the compiler, used for nodes like the if node
+    /// that need to compile their own code
     pub fn get_cloned_compiler(&self) -> NodesJSCompiler {
         let mut engine = Engine::new();
         upgrade_engine(&mut engine);
@@ -63,6 +114,10 @@ impl NodesJSCompiler {
         }
     }
 
+    /// Generates a random variable name.
+    /// Variable names are just two first parts of a v4 uuid combined.
+    /// It is useful to prefix variable with for example underscore to ensure
+    /// they don't start with a number
     pub(crate) fn random_var_name() -> String {
         let id = uuid::Uuid::new_v4();
         let id = id.to_string();
@@ -72,12 +127,14 @@ impl NodesJSCompiler {
         format!("{}", id)
     }
 
+    /// Loads a project from a path
     pub fn load_project(path: PathBuf) -> DisbotterProjectData {
         let file = std::fs::read_to_string(path).unwrap();
         let project: DisbotterProjectData = serde_json::from_str(&file).unwrap();
         project
     }
 
+    /// Adds available nodes from a path
     pub fn add_available_nodes(&mut self, path: PathBuf) {
         let nodes = AvailableNode::load_nodes(path, &mut self.engine);
         for node in nodes {
@@ -85,24 +142,32 @@ impl NodesJSCompiler {
         }
     }
 
-    pub fn compile_project(mut self) -> Program {
+    /// Compiles the project.
+    /// This means it will compile all commands, events, etc.
+    pub fn compile_project(mut self) -> Result<Program, CompilerError> {
         for command in self.project.clone().content.commands.iter() {
-            self.compile_command(&command);
+            self.compile_command(&command)?;
         }
 
-        self.program
+        Ok(self.program)
     }
 
+    /// Adds a global variable to the var cache
     pub fn add_var(&mut self, var_key: String, var_name: String) {
         self.var_cache.lock().unwrap().insert(PortIdentifier::Global { key: var_key }, var_name);
     }
 
+    /// Clears all variables from the var cache
     pub fn clear_var_cache(&mut self) {
         self.var_cache.lock().unwrap().clear();
     }
 
-    pub fn compile_command(&mut self, command: &DisbotterProjectCommand) {
+    /// Compiles specified command
+    pub fn compile_command(&mut self, command: &DisbotterProjectCommand) -> Result<(), CompilerError> {
+        // Get builder
         let mut builder = self.program.get_file_builder(format!("commands/{}.ts", command.name), &self.var_cache, self.get_cloned_compiler());
+        
+        // Boilerplate
         builder.add_lines(vec![
             "export default class extends Command {".to_string(),
             "   public readonly builder = new SlashCommandBuilder()".to_string(),
@@ -113,8 +178,10 @@ impl NodesJSCompiler {
         ]);
         builder.increase_ident_by(2);
 
-        self.compile_flow(&command.flow, builder.clone(), "__start__");
+        // Compile flow
+        self.compile_flow(&command.flow, builder.clone(), "__start__")?;
 
+        // More boilerplate
         builder.decrease_ident_by(2);
         builder.add_lines(vec![
             "   }".to_string(),
@@ -123,8 +190,11 @@ impl NodesJSCompiler {
         builder.add_import("CommandInteraction, SlashCommandBuilder".to_string(), "discord.js".to_string());
         builder.add_import("Command, LocalizedTranslations".to_string(), "disbotter".to_string());
         builder.finalize();
+
+        Ok(())
     }
 
+    /// Get whatever port is connected to
     pub fn get_flow_target(&self, flow: &DisbotterFlow, port: PortIdentifier) -> Option<PortIdentifier> {
         match port {
             PortIdentifier::Input { node_uid, port_key } => {
@@ -150,7 +220,7 @@ impl NodesJSCompiler {
     }
 
     /// Map the outputs of other nodes to the inputs of the current node
-    pub fn map_node_inputs(&mut self, flow: &DisbotterFlow, node: &DisbotterFlowNode, builder: CodeBuilder) {
+    pub fn map_node_inputs(&mut self, flow: &DisbotterFlow, node: &DisbotterFlowNode, builder: CodeBuilder) -> Result<(), CompilerError> {
         // Iterate over all inputs
         let node_connections = flow.connections.iter()
             .filter(|c| c.to == node.uid)
@@ -177,7 +247,7 @@ impl NodesJSCompiler {
                 if from_node_template.is_pure {
                     // Compile the node
                     drop(var_cache); // Drop the lock to prevent deadlocks
-                    self.compile_node(from_node, flow, builder.clone());
+                    self.compile_node(from_node, flow, builder.clone())?;
                     var_cache = var_cache_c.lock().unwrap();
 
                     // Bind the output to the input
@@ -198,13 +268,17 @@ impl NodesJSCompiler {
                 var_cache.insert(PortIdentifier::Input { node_uid: node.uid.clone(), port_key: key.clone() }, get_raw_value(value));
             }
         }
+
+        Ok(())
     }
 
-    pub fn compile_flow_from_port(&mut self, flow: &DisbotterFlow, builder: CodeBuilder, port: PortIdentifier, node: &DisbotterFlowNode) {
-        let oport_key = match port {
-            PortIdentifier::Output { node_uid: _, port_key } => port_key,
-            _ => panic!("Invalid port connection")
-        };
+    /// Compiles flow starting from specified node
+    pub fn compile_flow_from_port(&mut self, flow: &DisbotterFlow, builder: CodeBuilder, port: PortIdentifier, node: &DisbotterFlowNode)
+        -> Result<(), CompilerError> {
+        let oport_key = match &port {
+            PortIdentifier::Output { node_uid: _, port_key } => Ok(port_key),
+            _ => Err(CompilerError::InvalidPortIdentifier(port.clone()))
+        }?;
 
         let mut current_flow_out: Option<PortIdentifier> = 
             Some(node.get_port_out(&oport_key));
@@ -217,20 +291,23 @@ impl NodesJSCompiler {
             }
             if let PortIdentifier::Input { node_uid, port_key } = target.unwrap() {
                 if port_key != "__flow_in__" {
-                    panic!("Invalid flow connection");
+                    return Err(CompilerError::InvalidPortIdentifier(port.clone()));
                 }
                 let node = flow.nodes.iter().find(|n| n.uid == node_uid).unwrap();
 
 
-                self.compile_node(node, flow, builder.clone());
+                self.compile_node(node, flow, builder.clone())?;
                 current_flow_out = Some(node.get_port_out("__flow_out__"));
             } else {
                 break;
             }
         }
+
+        Ok(())
     }
 
-    pub fn compile_flow(&mut self, flow: &DisbotterFlow, mut builder: CodeBuilder, start_node_id: &str) {
+    /// Find node that has id equal to specified id
+    pub fn compile_flow(&mut self, flow: &DisbotterFlow, mut builder: CodeBuilder, start_node_id: &str) -> Result<(), CompilerError> {
         builder.compiler.current_flow = Some(flow.clone());
         // Find the start node
         let start_node = flow.nodes.iter().find(|n| n.node_type == start_node_id).expect(
@@ -243,23 +320,32 @@ impl NodesJSCompiler {
         self.add_var("___translations".to_string(), "__TRANSLATIONS__".to_string());
 
         // Compile the start node
-        self.compile_node(start_node, flow, builder.clone());
+        self.compile_node(start_node, flow, builder.clone())?;
 
         // Compile the rest of the flow
-        self.compile_flow_from_port(flow, builder.clone(), start_node.get_port_out("__flow_out__"), start_node);
+        self.compile_flow_from_port(flow, builder.clone(), start_node.get_port_out("__flow_out__"), start_node)?;
+
+        Ok(())
     }
 
-    pub fn compile_node(&mut self, node: &DisbotterFlowNode, flow: &DisbotterFlow, mut builder: CodeBuilder) {
-        self.map_node_inputs(flow, node, builder.clone());
+    pub fn compile_node(&mut self, node: &DisbotterFlowNode, flow: &DisbotterFlow, mut builder: CodeBuilder) -> Result<(), CompilerError> {
+        self.map_node_inputs(flow, node, builder.clone())?;
         let node_type = &node.node_type;
         let node_id = &node.uid;
-        let node = self.available_nodes.get(node_type).unwrap();
+        let node = self.available_nodes.get(node_type);
+        if node.is_none() {
+            return Err(CompilerError::NodeNotFound(node_type.clone()));
+        }
+        let node = node.unwrap();
         builder.current_node_id = node_id.clone();
-        node.call_action(&mut self.engine, builder.clone());
-        println!("Compiled node {} ({})", node_type, node_id);
+        node.call_action(&mut self.engine, builder.clone())?;
+        println!("{} {}", "Compiled node ".green(), node_id);
+
+        Ok(())
     }
 }
 
+/// ===< Engine upgrades >=== //
 fn expr_shortcut_add_line(context: &mut EvalContext, inputs: &[Expression]) -> Result<Dynamic, Box<EvalAltResult>> {
     // Replace -> $expr$ with builder.add_line($expr$)
     let expr = &inputs[0];
@@ -331,9 +417,10 @@ pub struct AvailableNode {
 }
 
 impl AvailableNode {
-    pub fn call_action(&self, engine: &mut Engine, builder: CodeBuilder) {
+    pub fn call_action(&self, engine: &mut Engine, builder: CodeBuilder) -> Result<(), CompilerError> {
         let mut scope = Scope::new();
-        engine.call_fn::<()>(&mut scope, &self.ast, "action", (builder,)).unwrap();
+        engine.call_fn::<()>(&mut scope, &self.ast, "action", (builder,)).map_err(|e| CompilerError::RhaiError(e))?;
+        Ok(())
     }
 
     pub fn load_nodes(path: PathBuf, engine: &mut Engine) -> Vec<AvailableNode> {
@@ -365,6 +452,7 @@ impl AvailableNode {
     }
 }
 
+// ===< Data structures >=== //
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DisbotterProjectData {
     metadata: DisbotterProjectMetadata,

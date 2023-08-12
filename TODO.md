@@ -6,6 +6,7 @@
 - [ ] CLI tool for compiling
 - [ ] Meaningful error messages
 - [ ] Command options
+- [ ] Comment the code
 
 # Alpha
 
@@ -24,6 +25,7 @@
 - [ ] Marketplace
 - [ ] Editor LoD
 - [ ] Writing commands/events in JS
+- [ ] How to use tutorial on the website
 
 # Release Candidate
 

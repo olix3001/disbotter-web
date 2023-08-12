@@ -1,5 +1,4 @@
 use std::{sync::{Mutex, Arc}, collections::HashMap, path::PathBuf};
-
 use rhai::CustomType;
 
 use crate::compiler::{PortIdentifier, NodesJSCompiler};
@@ -203,7 +202,8 @@ impl CodeBuilder {
         let cf = self.compiler.current_flow.as_ref().unwrap().clone();
         let port = PortIdentifier::Output { node_uid: self.current_node_id.clone(), port_key: flow_port };
 
-        self.compiler.compile_flow_from_port(&cf, new_builder.clone(), port, cf.get_node(&self.current_node_id));
+        self.compiler.compile_flow_from_port(&cf, new_builder.clone(), port, cf.get_node(&self.current_node_id))
+            .expect(&format!("Failed to compile flow output inside node: {}", self.current_node_id));
 
         // Add the code to the current builder
         self.add_lines(new_builder.finalize_vec());
