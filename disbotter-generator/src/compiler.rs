@@ -42,6 +42,7 @@ pub enum CompilerError {
     RhaiError(Box<EvalAltResult>),
     InvalidPortIdentifier(PortIdentifier),
     NodeNotFound(String),
+    BadContext(String),
     NoStartNode,
 }
 
@@ -59,6 +60,9 @@ impl CompilerError {
             }
             CompilerError::NoStartNode => {
                 format!("{}: {}", "No start node".red(), "No start node found")
+            }
+            CompilerError::BadContext(context) => {
+                format!("{}: {}", "Bad context".red(), context)
             }
         }
     }
@@ -176,7 +180,33 @@ impl NodesJSCompiler {
             "export default class extends Command {".to_string(),
             "   public readonly builder = new SlashCommandBuilder()".to_string(),
             format!("       .setName(\"{}\")", command.name),
-            format!("       .setDescription(\"{}\");", command.description),
+            format!("       .setDescription(\"{}\")", command.description),
+        ]);
+
+        // Add options
+        for option in command.options.iter() {
+            let cmd_option = match option.option_type {
+                0 => {
+                    "addStringOption"
+                },
+                1 => {
+                    "addUserOption"
+                },
+                2 => {
+                    "addChannelOption"
+                },
+                _ => {
+                    return Err(CompilerError::BadContext(format!("Unknown option type: {}", option.option_type)));
+                }
+            };
+
+            builder.add_line(
+                format!("\t\t.{}(option => option\n\t\t\t.setName(\"{}\")\n\t\t\t.setDescription(\"{}\")\n\t\t\t.setRequired({})\n\t\t)", cmd_option, option.name, option.description, option.required),
+            );
+        }
+
+        // More boilerplate
+        builder.add_lines(vec![
             "".to_string(),
             "   public async handle(__TRANSLATIONS__: LocalizedTranslations, __INTERACTION__: CommandInteraction): Promise<void> {".to_string(),
         ]);
@@ -223,6 +253,45 @@ impl NodesJSCompiler {
         }
     }
 
+    /// Gets global variable
+    pub fn get_global_var(&self, key: String) -> Option<String> {
+        self.var_cache.lock().unwrap().get(&PortIdentifier::Global { key })
+            .map(|v| v.clone())
+    }
+
+    /// Some nodes need to be compiled differently, for example option nodes, these nodes are compiled here
+    /// and return true if they were compiled
+    /// If this function returns false, the node is not special and should be compiled normally
+    pub fn compile_special_node(&mut self, mut builder: CodeBuilder, node: &DisbotterFlowNode) -> Result<bool, CompilerError> {
+        // Check if node is special
+        if node.node_type.starts_with("___special_") {
+            // Option node
+            if node.node_type.starts_with("___special_get_option_") {
+                let option_name = node.node_type.replace("___special_get_option_", "");
+                let option_name = option_name.replace("___", "");
+
+                // Get interaction
+                let interaction_name = self.get_global_var("___interaction".to_string());
+
+                if interaction_name.is_none() {
+                    return Err(CompilerError::BadContext("Cannot get option outside of interaction".to_string()));
+                }
+
+                // Create variable for option
+                let option_var_name = format!("__get_option_{}", option_name);
+                builder.add_line(format!("let {} = {}.options.get(\"{}\");", option_var_name, interaction_name.unwrap(), option_name));
+
+                builder.var_cache.lock().unwrap().insert(
+                    PortIdentifier::Output { node_uid: node.uid.clone(), port_key: "value".to_string() },
+                    option_var_name.clone()
+                );
+
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
     /// Map the outputs of other nodes to the inputs of the current node
     pub fn map_node_inputs(&mut self, flow: &DisbotterFlow, node: &DisbotterFlowNode, builder: CodeBuilder) -> Result<(), CompilerError> {
         // Iterate over all inputs
@@ -246,7 +315,22 @@ impl NodesJSCompiler {
                     .find(|n| n.uid == conn.from)
                     .unwrap();
 
-                let from_node_template = self.available_nodes.get(&from_node.node_type).unwrap();
+                let from_node_template = self.available_nodes.get(&from_node.node_type);
+                if from_node_template.is_none() {
+                    drop(var_cache);
+                    if self.compile_special_node(builder.clone(), from_node)? {
+                        var_cache = var_cache_c.lock().unwrap();
+                        // Bind the output to the input
+                        let new_data = var_cache
+                            .get(&PortIdentifier::Output { node_uid: conn.from.clone(), port_key: conn.from_key.clone() })
+                            .unwrap()
+                            .clone();
+                        var_cache.insert(PortIdentifier::Input { node_uid: conn.to.clone(), port_key: conn.to_key.clone() }, new_data);
+                        continue;
+                    }
+                    return Err(CompilerError::NodeNotFound(from_node.node_type.clone()));
+                }
+                let from_node_template = from_node_template.unwrap();
 
                 if from_node_template.is_pure {
                     // Compile the node
@@ -480,7 +564,18 @@ pub struct DisbotterProjectCommand {
     uid: String,
     name: String,
     description: String,
-    flow: DisbotterFlow
+    flow: DisbotterFlow,
+    options: Vec<DisbotterProjectCommandOption>
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DisbotterProjectCommandOption {
+    name: String,
+    description: String,
+    #[serde(rename = "type")]
+    option_type: i32,
+    required: bool,
+    choices: Vec<String>
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
