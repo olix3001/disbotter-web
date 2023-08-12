@@ -44,6 +44,8 @@ pnpm dev
 npm run dev
 ```
 
+**Note**: You can skip steps 2-3 if you are using the web editor from https://disbotter.olix3001.xyz. (I recommend using the web editor from the website as it is automatically updated and has builtin error reporting).
+
 4. Work on the project, add some commands and etc.
 5. Save the project
 
