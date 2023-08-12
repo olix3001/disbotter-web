@@ -112,7 +112,7 @@
     </div>
 {/if}
 
-<svelte:body on:click={closeContextCheck} />
+<svelte:body on:mousedown={closeContextCheck} />
 
 <style>
     .editor-context-search {

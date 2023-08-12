@@ -1,2 +1,2 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1>Welcome to Disbotter!</h1>
+<p>This project is quite new and currently there is no main page. Please click <a href="/editor">here</a> to go to the editor.</p>

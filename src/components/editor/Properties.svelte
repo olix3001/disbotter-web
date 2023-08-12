@@ -100,6 +100,13 @@
         height: 50%;
     }
 
+    .properties > div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-bottom: .5rem;
+    }
+
     .properties input {
         background-color: #1f1f1f;
         border-radius: 10px;

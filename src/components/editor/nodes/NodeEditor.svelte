@@ -68,10 +68,8 @@
         if (e.button == 0) {
             dragging = false;
             if ($PROJECT.currentConnection) {
-                PROJECT.update(p => {
-                    p.currentConnection = null;
-                    return p;
-                });
+                e.preventDefault();
+                openContextMenu(e);
             }
         }
     }

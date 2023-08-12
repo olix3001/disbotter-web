@@ -7,7 +7,7 @@
 
     function addCommand() {
         PROJECT.update(p => {
-            p.addCommand(new Command('new-command', ''));
+            p.addCommand(new Command('new-command', 'Do not leave empty description.'));
             return p;
         });
     }
