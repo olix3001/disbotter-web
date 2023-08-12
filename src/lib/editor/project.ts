@@ -10,7 +10,6 @@ import {
 	flowFromProjectJSON
 } from './node';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
 
 export const projectKey = Symbol('disbotter project');
 
