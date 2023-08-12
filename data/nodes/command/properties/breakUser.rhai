@@ -23,6 +23,11 @@ const outputs = #{
         type: "text",
         index: 1
     },
+    id: #{
+        name: "id",
+        type: "text",
+        index: 2
+    },
     username: #{
         name: "username",
         type: "text",
@@ -46,6 +51,7 @@ fn action(builder) {
 
     out bot = `${user}.bot`;
     out discriminator = `${user}.discriminator`;
+    out id = `${user}.id`;
     out username = `${user}.username`;
     out tag = `${user}.tag`;
     out dm_channel = `${user}.dmChannel`;

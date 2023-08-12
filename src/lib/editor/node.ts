@@ -8,8 +8,6 @@ export interface NodeType {
 	outputs: NodeIOType;
 
 	defaultHardcoded?: NodeIO;
-
-	action: (node: Node, inputs: NodeIO) => NodeIO;
 }
 
 export type NodeIOType = {

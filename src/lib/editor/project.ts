@@ -155,7 +155,20 @@ export class DisbotterProject {
 
 		// Then, deserialize all project content
 		this.commands = data.content.commands.map((commandData: any) => {
-			const command = new Command(commandData.name, commandData.description);
+			const command = new Command(
+				commandData.name,
+				commandData.description,
+				commandData.options.map(
+					(optionData: any) =>
+						new CommandOption(
+							optionData.name,
+							optionData.description,
+							optionData.type,
+							optionData.required,
+							optionData.choices
+						)
+				)
+			);
 			command.flow = flowFromProjectJSON(commandData.flow, commandAvailableNodes);
 			return command;
 		});
@@ -214,9 +227,12 @@ export class Command {
 
 	public flow: NodeFlow;
 
-	constructor(name: string, description: string) {
+	public options: CommandOption[] = [];
+
+	constructor(name: string, description: string, options: CommandOption[] = []) {
 		this.name = name;
 		this.description = description;
+		this.options = options;
 
 		this.flow = {
 			nodes: [],
@@ -230,7 +246,173 @@ export class Command {
 			uid: this.uid,
 			name: this.name,
 			description: this.description,
+			options: this.options.map((option) => option.toJSONParseable()),
 			flow: flowToJSONParseable(this.flow)
 		};
+	}
+
+	public addOption(option: CommandOption): void {
+		this.options.push(option);
+
+		// If there is already a node with the same name, add a number at the end
+		const oryginalName = option.name.toString();
+		let i = 0;
+		while (
+			this.flow.availableNodes.find(
+				(node) => node.id === '___special_get_option_' + option.name + '___'
+			)
+		) {
+			i++;
+			option.name = oryginalName + i;
+		}
+
+		// Add node to get the option
+		this.flow.availableNodes.push({
+			id: '___special_get_option_' + option.name + '___',
+			title: 'Get option ' + option.name,
+			description: option.description,
+			category: 'Options',
+			inputs: {},
+			outputs: {
+				value: {
+					name: 'value',
+					type: optionTypeToNodeType(option.type)
+				}
+			}
+		});
+	}
+
+	public removeOption(option: CommandOption): void {
+		this.options = this.options.filter((opt) => opt !== option);
+
+		// Remove node to get the option
+		this.flow.availableNodes = this.flow.availableNodes.filter(
+			(node) => node.id !== '___special_get_option_' + option.name + '___'
+		);
+
+		// Remove all connections that use the option
+		this.flow.connections = this.flow.connections.filter((connection) => {
+			if (connection.from?.type.id === '___special_get_option_' + option.name + '___') {
+				return false;
+			}
+			return true;
+		});
+
+		// Remove all nodes that use the option
+		this.flow.nodes = this.flow.nodes.filter((node) => {
+			if (node.type.id === '___special_get_option_' + option.name + '___') {
+				return false;
+			}
+			return true;
+		});
+	}
+
+	public updateOption(oldOption: CommandOption, newOption: CommandOption): void {
+		// Check if there is no node with the new option name
+		if (
+			oldOption.name !== newOption.name &&
+			this.flow.availableNodes.some(
+				(node) => node.id === '___special_get_option_' + newOption.name + '___'
+			)
+		) {
+			return;
+		}
+
+		// Update the node to get the option
+		this.flow.availableNodes.forEach((node) => {
+			if (node.id == '___special_get_option_' + oldOption.name + '___') {
+				node.id = '___special_get_option_' + newOption.name + '___';
+				node.title = 'Get option ' + newOption.name;
+				node.description = newOption.description;
+				node.outputs = {
+					value: {
+						name: 'value',
+						type: optionTypeToNodeType(newOption.type)
+					}
+				};
+			}
+		});
+
+		// Ensure that all connections that use the option are still valid
+		this.flow.connections = this.flow.connections.filter((connection) => {
+			if (connection.from?.type.id === '___special_get_option_' + newOption.name + '___') {
+				const fc = connection.from?.type.outputs[connection.fromKey ?? ''];
+				const tc = connection.to?.type.inputs[connection.toKey ?? ''];
+				if (
+					fc.type.type !== tc?.type.type ||
+					!tc?.type.structTags?.every((tag) => fc.type.structTags?.includes(tag))
+				) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		// Replace the old option with the new one
+		this.options.forEach((option) => {
+			if (option === oldOption) {
+				option.name = newOption.name;
+				option.description = newOption.description;
+				option.type = newOption.type;
+				option.required = newOption.required;
+				option.choices = newOption.choices;
+			}
+		});
+	}
+}
+
+export class CommandOption {
+	public name: string;
+	public description: string;
+	public type: CommandOptionType;
+	public required = false;
+	public choices: string[] = [];
+
+	constructor(
+		name: string,
+		description: string,
+		type: CommandOptionType,
+		required = false,
+		choices: string[] = []
+	) {
+		this.name = name;
+		this.description = description;
+		this.type = type;
+		this.required = required;
+		this.choices = choices;
+	}
+
+	public clone(): CommandOption {
+		return window.structuredClone(this);
+	}
+
+	public toJSONParseable(): any {
+		return {
+			name: this.name,
+			description: this.description,
+			type: this.type,
+			required: this.required,
+			choices: this.choices
+		};
+	}
+}
+
+export enum CommandOptionType {
+	String,
+	User,
+	Channel
+}
+
+function optionTypeToNodeType(type: CommandOptionType): {
+	type: NodeConnectionType;
+	structTags?: string[];
+} {
+	switch (type) {
+		case CommandOptionType.String:
+			return { type: NodeConnectionType.Text };
+		case CommandOptionType.User:
+			return { type: NodeConnectionType.Structure, structTags: ['user'] };
+		case CommandOptionType.Channel:
+			return { type: NodeConnectionType.Structure, structTags: ['channel', 'guild_channel'] };
 	}
 }
