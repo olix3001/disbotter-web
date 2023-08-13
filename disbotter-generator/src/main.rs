@@ -78,7 +78,6 @@ fn main() {
                     println!("{}", err.to_pretty());
                 }
             }
-
         },
         Some(Commands::Init { path, pnpm }) => {
             // If command is to initialize a new project
