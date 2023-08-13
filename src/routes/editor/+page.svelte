@@ -8,6 +8,7 @@
 	import NodeEditor from "../../components/editor/nodes/NodeEditor.svelte";
 	import Properties from "../../components/editor/Properties.svelte";
     import { writable } from "svelte/store";
+	import BuildTime from "../../components/common/BuildTime.svelte";
 
     let project = writable(new DisbotterProject('New project'));
 
@@ -51,6 +52,8 @@
         </Splitpanes>
     </ProjectProvider>
 </div>
+
+<BuildTime />
 
 <style>
     .pane {
