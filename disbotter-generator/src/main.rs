@@ -34,6 +34,13 @@ enum Commands {
         #[arg(short, long, help="Path to the directory/directories containing the nodes")]
         nodes: String
     },
+    #[command(name="init", about="Initialize a new project", aliases=&["new", "create"])]
+    Init {
+        #[arg(help="Path to the output directory", index = 1)]
+        path: String,
+        #[arg(long, help="use pnpm instead of npm")]
+        pnpm: bool
+    }
 }
 
 fn main() {
@@ -72,6 +79,63 @@ fn main() {
                 }
             }
 
+        },
+        Some(Commands::Init { path, pnpm }) => {
+            // If command is to initialize a new project
+            let url = "https://github.com/olix3001/disbotter-example-project";
+            println!("{} {}", "Cloning repository:".green(), url.yellow());
+            match git2::Repository::clone(url, path.clone()) {
+                Ok(_) => {},
+                Err(err) => {
+                    println!("{} {}", "Failed to clone repository:".red(), url.yellow());
+                    println!("{:?}", err);
+                    return;
+                }
+            };
+
+            // Install dependencies
+            println!("{}", "Installing dependencies...".green());
+            let mut cmd = if pnpm {
+                #[cfg(windows)]
+                let prog = "pnpm.cmd";
+                #[cfg(not(windows))]
+                let prog = "pnpm";
+
+                std::process::Command::new(prog)
+            } else {
+                #[cfg(windows)]
+                let prog = "npm.cmd";
+                #[cfg(not(windows))]
+                let prog = "npm";
+
+                std::process::Command::new(prog)
+            };
+
+            cmd.arg("install").current_dir(path.clone());
+            let output = cmd.output();
+
+            match output {
+                Ok(output) => {
+                    if output.status.success() {
+                        println!("{}", "Successfully installed dependencies:".green());
+                    } else {
+                        println!("{}", "Failed to install dependencies:".red());
+                        println!("{}", String::from_utf8_lossy(&output.stderr));
+                        return;
+                    }
+                },
+                Err(err) => {
+                    println!("{}", "Failed to install dependencies:".red());
+                    println!("{:?}", err);
+                    return;
+                }
+            } 
+
+            // Show success message
+            println!("{} {}", "Successfully initialized project in:".green(), path.yellow());
+
+            println!("{} {}", "To compile the project, run:".green(), format!("disbotter compile ... -o {}", std::path::PathBuf::from(path).join("src").to_str().unwrap()).yellow());
+            println!("{} {}", "To run the project, go to the project directory and run:".green(), "npm/pnpm start".yellow());
         },
         None => {
             println!("No command specified!");
