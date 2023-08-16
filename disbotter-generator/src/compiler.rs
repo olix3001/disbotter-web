@@ -161,6 +161,13 @@ impl NodesJSCompiler {
         }
     }
 
+    /// Adds available nodes from vector
+    pub fn add_available_nodes_from_vec(&mut self, nodes: &Vec<AvailableNode>) {
+        for node in nodes {
+            self.available_nodes.insert(node.id.clone(), node.clone());
+        }
+    }
+
     /// Compiles the project.
     /// This means it will compile all commands, events, etc.
     pub fn compile_project(mut self) -> Result<Program, CompilerError> {

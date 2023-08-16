@@ -51,6 +51,22 @@ impl Program {
             std::fs::write(file_path, &file.lock().unwrap().code).unwrap();
         }
     }
+
+    /// Export program to string
+    pub fn export_to_string(&self) -> String {
+        let mut code = String::new();
+
+        for file in self.files.iter() {
+            code.push_str("====< File: ");
+            code.push_str(&file.lock().unwrap().path);
+            code.push_str(" >=====\n");
+            code.push_str(&file.lock().unwrap().code);
+            code.push('\n');
+            code.push('\n');
+        }
+
+        code
+    }
 }
 
 pub struct ProgramFile {

@@ -1,7 +1,8 @@
-use compiler::NodesJSCompiler;
+use compiler::{NodesJSCompiler, AvailableNode, upgrade_engine};
 use loader::{load_all_nodes, export_node_declarations, Node};
 use clap::{Parser, Subcommand, arg};
 use colored::*;
+use rhai::Engine;
 
 // ===< Module imports >=== //
 pub mod loader;
@@ -152,7 +153,10 @@ fn main() {
             // })).collect();
             
             let api = server::DisbotterRESTApi::new();
-            api.start().expect("Failed to start server");
+            let mut engine = Engine::new();
+            upgrade_engine(&mut engine);
+            let nodes = AvailableNode::load_nodes(nodes.into(), &mut engine);
+            api.start(std::sync::Arc::new(nodes)).expect("Failed to start server");
         },
         None => {
             println!("No command specified!");
