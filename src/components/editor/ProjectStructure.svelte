@@ -2,6 +2,7 @@
 	import { getContext } from "svelte";
 	import Collapse from "../common/Collapse.svelte";
 	import { Command, projectKey, type ProjectContext } from "$lib/editor/project";
+    import Trash_Light from "$lib/assets/trash_light.svg";
 
     const PROJECT = getContext<ProjectContext>(projectKey);
 
@@ -18,6 +19,13 @@
             return p;
         });
     }
+
+    function deleteCommand(command: Command) {
+        PROJECT.update(p => {
+            p.deleteCommand(command);
+            return p;
+        });
+    }
 </script>
 
 <Collapse open={true}>
@@ -31,6 +39,7 @@
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <div class="element" class:selected={$PROJECT.isEditing(command)} on:click={() => setEditing(command)}>
                 <p>{command.name}</p>
+                <button on:click={() => deleteCommand(command)}><img src={Trash_Light} alt="Delete" width="16" height="16" /></button>
              </div>
         {:else}
             <p>No commands yet.</p>
@@ -69,6 +78,19 @@
     .element {
         cursor: pointer;
         margin-bottom: .2em;
+        display: flex;
+        justify-content: space-between;
+        padding-right: .5em;
+        align-items: center;
+        padding: 0.2em;
+    }
+
+    .element button {
+        background-color: transparent;
+        border: none;
+        color: var(--white);
+        padding: .3em;
+        cursor: pointer;
     }
 
     .element:hover {

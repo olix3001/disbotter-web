@@ -30,6 +30,10 @@ export class DisbotterProject {
 		this.currentlyEditing = { type: 'command', command };
 	}
 
+	public deleteCommand(command: Command): void {
+		this.commands = this.commands.filter((c) => c !== command);
+	}
+
 	public getCurrentFlow(): NodeFlow | null {
 		if (this.currentlyEditing?.type === 'command') {
 			return this.currentlyEditing.command?.flow ?? null;

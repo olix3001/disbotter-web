@@ -13,6 +13,25 @@ test('new button creates a command', async ({ page }) => {
 	await expect(page.locator('.selected')).toHaveText('new-command');
 });
 
+test('removing a command removes it from the list', async ({ page }) => {
+	await page.goto('/editor');
+
+	// Click button with text "New"
+	const newButton = await page.getByRole('button', { name: 'New' });
+	for (let i = 0; i < 5; i++) {
+		await newButton.click();
+	}
+
+	// Check that the command was created
+	await expect(page.getByText('new-command')).toHaveCount(5);
+
+	// Click on the delete button
+	page.getByRole('button', { name: 'Delete' }).nth(2).click();
+
+	// Check that the command was removed
+	await expect(page.getByText('new-command')).toHaveCount(4);
+});
+
 async function clickMenu(page: Page, name: string, optionName: string) {
 	// Click on the file menu
 	const fileMenu = await page.getByRole('button', { name });
