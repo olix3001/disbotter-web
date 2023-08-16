@@ -7,6 +7,7 @@ use colored::*;
 pub mod loader;
 pub mod builder;
 pub mod compiler;
+mod server;
 
 // ===< Main CLI >=== //
 #[derive(Parser)]
@@ -40,6 +41,11 @@ enum Commands {
         path: String,
         #[arg(long, help="use pnpm instead of npm")]
         pnpm: bool
+    },
+    #[command(name="server", about="Start the REST API server")]
+    Server {
+        #[arg(short, long, help="Path to the directory/directories containing the nodes")]
+        nodes: String
     }
 }
 
@@ -135,6 +141,18 @@ fn main() {
 
             println!("{} {}", "To compile the project, run:".green(), format!("disbotter compile ... -o {}", std::path::PathBuf::from(path).join("src").to_str().unwrap()).yellow());
             println!("{} {}", "To run the project, go to the project directory and run:".green(), "npm/pnpm start".yellow());
+        },
+        Some(Commands::Server { nodes }) => {
+            // If command is to start the server
+            // let paths = nodes.split(",");
+            // let nodes: Vec<Node> = paths.flat_map(|path| load_all_nodes(path.into()).unwrap_or_else(|err| {
+            //     println!("{} {}", "Failed to load nodes from path:".red(), path.to_string().yellow());
+            //     println!("{:?}", err);
+            //     vec![]
+            // })).collect();
+            
+            let api = server::DisbotterRESTApi::new();
+            api.start().expect("Failed to start server");
         },
         None => {
             println!("No command specified!");
