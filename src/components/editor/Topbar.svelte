@@ -1,7 +1,8 @@
 <script lang="ts">
     import CompileLightIcon from "$lib/assets/compile_light.svg";
     import { PUBLIC_API_URL } from "$env/static/public";
-	import { onMount } from "svelte";
+	import { getContext, onMount } from "svelte";
+	import { type ProjectContext, projectKey } from "$lib/editor/project";
 
     let api_available = false;
     
@@ -27,11 +28,17 @@
             }
         });
     });
+
+    const PROJECT = getContext<ProjectContext>(projectKey);
+
+    function handleCompileClick() {
+        $PROJECT.compileWithApi();
+    }
 </script>
 
 <div class="topbar">
     <div>
-        <button disabled={!api_available}>
+        <button disabled={!api_available} on:click={handleCompileClick}>
             <img src={CompileLightIcon} alt="Compile button"/>
             Compile
         </button>

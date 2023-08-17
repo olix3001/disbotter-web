@@ -206,8 +206,20 @@ export class DisbotterProject {
 		});
 	}
 
-	public compileWithApi() {
-		// TODO: Compile the project with the API
+	public async compileWithApi(options?: any) {
+		const resp = await fetch(PUBLIC_API_URL + '/compile', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				project: this.toJSONParseable(),
+				options
+			})
+		});
+
+		// TODO: Do something useful with the response
+		alert(await resp.text());
 	}
 }
 
