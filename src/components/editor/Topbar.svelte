@@ -10,7 +10,9 @@
     onMount(() => {
         api_fetch = new Promise(async (resolve, reject) => {
             try {
-                const response = await fetch(PUBLIC_API_URL + '/ping');
+                const response = await fetch(PUBLIC_API_URL + '/ping', {
+                    method: 'GET'
+                });
 
                 if (response.status != 200) {
                     api_available = false;

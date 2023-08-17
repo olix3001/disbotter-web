@@ -9,9 +9,11 @@ name = "disbotter"
 path = "src/main.rs"
 
 [dependencies]
+actix-cors = "0.6.4"
 actix-web = "4.3.1"
 clap = { version = "4.3.21", features = ["derive"] }
 colored = "2.0.4"
+env_logger = "0.10.0"
 git2 = "0.17.2"
 rhai = { version = "1.15.1", features = ["metadata", "serde", "sync"] }
 serde = "1.0.183"

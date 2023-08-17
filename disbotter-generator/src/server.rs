@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use tokio::runtime::Runtime;
-use actix_web::{web, App, HttpResponse, HttpServer};
+use actix_web::{web, App, HttpResponse, HttpServer, middleware::Logger};
 
 use crate::compiler::{DisbotterProjectData, NodesJSCompiler, AvailableNode};
 
@@ -47,11 +47,26 @@ impl DisbotterRESTApi {
     }
 
     pub fn start(&self, nodes: Arc<Vec<AvailableNode>>) -> std::io::Result<()> {
+        #[cfg(debug_assertions)]
+        {
+            println!("Starting server in debug mode...");
+            std::env::set_var("RUST_LOG", "actix_web=debug");
+            env_logger::try_init().ok();
+        }
+
         self.rt.block_on(async {
             println!("Starting server...");
+            
             HttpServer::new(move || {
+                let cors = actix_cors::Cors::permissive()
+                    .allowed_origin_fn(|origin, _| {
+                        origin.as_bytes().starts_with(b"http://localhost")
+                    })
+                    .allowed_origin("https://disbotter.olix3001.xyz");
                 let nodes = nodes.clone();
                 App::new()
+                    .wrap(cors)
+                    .wrap(Logger::default())
                     .app_data(web::Data::new(nodes))
                     .route("/ping", web::get().to(ping))
                     .route("/compile", web::post().to(compile))
