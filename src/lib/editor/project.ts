@@ -9,6 +9,7 @@ import {
 	flowFromProjectJSON
 } from './node';
 import { v4 as uuidv4 } from 'uuid';
+import { PUBLIC_API_URL } from '$env/static/public';
 
 export const projectKey = Symbol('disbotter project');
 
@@ -203,6 +204,10 @@ export class DisbotterProject {
 				}
 			});
 		});
+	}
+
+	public compileWithApi() {
+		// TODO: Compile the project with the API
 	}
 }
 

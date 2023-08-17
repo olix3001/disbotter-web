@@ -9,6 +9,7 @@
 	import Properties from "../../components/editor/Properties.svelte";
     import { writable } from "svelte/store";
 	import BuildTime from "../../components/common/BuildTime.svelte";
+	import Topbar from "../../components/editor/Topbar.svelte";
 
     let project = writable(new DisbotterProject('New project'));
 
@@ -28,11 +29,12 @@
 <div style="width: 100vw; height: 100vh; overflow: hidden;">
     <Navbar on:menuclick={handleMenuClick}/>
 
-    <div class="topbar">
-        <p class="project-name">{$project.name}</p>
-    </div>
 
     <ProjectProvider bind:PROJECT={project}>
+        <div class="topbar">
+            <p class="project-name">{$project.name}</p>
+            <Topbar />
+        </div>
         <Splitpanes style="height: 100%" theme="dark-splitpane-theme">
             <Pane minSize={12} size={15}>
                 <div class="sidebar pane">
@@ -74,10 +76,12 @@
         display: flex;
         flex-direction: row;
         border: 1.5px solid #313131;
+        align-items: center;
     }
 
     .project-name {
         margin: 1em;
         font-weight: 700;
+        white-space: nowrap;
     }
 </style>
