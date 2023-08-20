@@ -580,6 +580,7 @@ dependencies = [
  "colored",
  "env_logger",
  "git2",
+ "regex",
  "rhai",
  "serde",
  "serde_json",

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, path::PathBuf, io::Write};
 
 use tokio::runtime::Runtime;
 use actix_web::{web, App, HttpResponse, HttpServer, middleware::Logger};
@@ -6,11 +6,24 @@ use actix_web::{web, App, HttpResponse, HttpServer, middleware::Logger};
 use crate::compiler::{DisbotterProjectData, NodesJSCompiler, AvailableNode};
 
 pub struct DisbotterRESTApi {
-    rt: Runtime
+    rt: Runtime,
+}
+
+#[derive(serde::Serialize)]
+pub struct DisbotterRESTApiConfig {
+    #[serde(skip)]
+    pub nodes: Arc<Vec<AvailableNode>>,
+    #[serde(skip)]
+    pub projects: Option<PathBuf>,
+    pub can_run: bool,
 }
 
 async fn ping() -> HttpResponse {
     HttpResponse::Ok().body("pong")
+}
+
+async fn config(config: web::Data<DisbotterRESTApiConfig>) -> HttpResponse {
+    HttpResponse::Ok().json(config.get_ref())
 }
 
 #[derive(serde::Deserialize)]
@@ -18,7 +31,7 @@ struct CompileRequest {
     project: Option<DisbotterProjectData>,
 }
 
-async fn compile(mut req: web::Json<CompileRequest>, nodes: web::Data<Arc<Vec<AvailableNode>>>) -> HttpResponse {
+async fn compile(mut req: web::Json<CompileRequest>, config: web::Data<DisbotterRESTApiConfig>) -> HttpResponse {
     let project = match req.project.take() {
         Some(project) => project,
         None => {
@@ -26,7 +39,7 @@ async fn compile(mut req: web::Json<CompileRequest>, nodes: web::Data<Arc<Vec<Av
         }
     };
     let mut compiler = NodesJSCompiler::new(project);
-    compiler.add_available_nodes_from_vec(nodes.get_ref());
+    compiler.add_available_nodes_from_vec(&config.nodes);
     let project = compiler.compile_project();
 
     match project {
@@ -39,14 +52,117 @@ async fn compile(mut req: web::Json<CompileRequest>, nodes: web::Data<Arc<Vec<Av
     }
 }
 
+#[derive(serde::Deserialize)]
+struct RunRequest {
+    project: Option<DisbotterProjectData>,
+    token: String,
+    client_id: String,
+    guild_id: String,
+}
+
+async fn compile_and_run(mut req: web::Json<RunRequest>, config: web::Data<DisbotterRESTApiConfig>) -> HttpResponse {
+    println!("Fuck");
+    if !config.can_run {
+        return HttpResponse::Forbidden().body("Running is disabled on the server");
+    }
+
+    // First ensure that there is a project
+    let project = match req.project.take() {
+        Some(project) => project,
+        None => {
+            return HttpResponse::BadRequest().body("Missing project data");
+        }
+    };
+
+    // Then if there is no folder related to the project, create one
+    let project_folder = config.projects.as_ref().unwrap().join(project.metadata.name.replace(" ", "_").clone());
+    if !project_folder.exists() {
+        std::fs::create_dir_all(&project_folder).unwrap();
+    }
+
+    // If there is already a folder, skip cloning the example project
+    if !project_folder.join("src").exists() {
+
+        // Then clone example project to the folder
+        let url = "https://github.com/olix3001/disbotter-example-project";
+        match git2::Repository::clone(url, &project_folder) {
+            Ok(_) => {},
+            Err(err) => {
+                println!("{:?}", err);
+                return HttpResponse::InternalServerError().body("Failed to clone example project");
+            }
+        };
+
+        // Install dependencies
+        let cmd = if cfg!(windows) {
+            "pnpm.cmd"
+        } else {
+            "pnpm"
+        };
+
+        let mut cmd = std::process::Command::new(cmd);
+
+        cmd.arg("install").current_dir(&project_folder);
+        let output = cmd.output();
+
+        match output {
+            Ok(output) => {
+                if !output.status.success() {
+                    return HttpResponse::InternalServerError().body("Failed to install dependencies");
+                }
+            },
+            Err(err) => {
+                return HttpResponse::InternalServerError().body(format!("Failed to install dependencies: {:?}", err));
+            }
+        } 
+    }
+
+    // Remove .env file
+    std::fs::remove_file(project_folder.join(".env")).unwrap_or(());
+
+    // Write token to .env
+    let mut env_file = std::fs::File::create(project_folder.join(".env")).unwrap();
+    env_file.write_all(format!("TOKEN={}\n", req.token).as_bytes()).unwrap();
+    env_file.write_all(format!("CLIENT_ID={}\n", req.client_id).as_bytes()).unwrap();
+
+    // Replace guild id in index.ts
+    let index_file_content = std::fs::read_to_string(project_folder.join("src/index.ts")).unwrap();
+    let re = regex::Regex::new(r"devGuilds: \[.*\]").unwrap();
+    let index_file_content = re.replace_all(&index_file_content, &format!("devGuilds: [\"{}\"]", req.guild_id));
+
+    std::fs::write(project_folder.join("src/index.ts"), index_file_content.as_bytes()).unwrap();
+
+    // Compile project
+    let mut compiler = NodesJSCompiler::new(project);
+    compiler.add_available_nodes_from_vec(&config.nodes);
+    let project = compiler.compile_project();
+
+    let project = match project {
+        Ok(project) => project,
+        Err(err) => {
+            return HttpResponse::InternalServerError().body(format!("Failed to compile project: {:?}", err));
+        }
+    };
+
+    // Write project to files
+    project.export_to_path(project_folder.join("src"));
+
+    // Start the bot in the project folder
+    // let mut cmd = tokio::process::Command::new("pnpm");
+
+    // cmd.arg("run").arg("start").current_dir(&project_folder);
+
+    HttpResponse::Ok().body("Running...")
+}
+
 impl DisbotterRESTApi {
     pub fn new() -> Self {
         Self {
-            rt: Runtime::new().unwrap()
+            rt: Runtime::new().unwrap(),
         }
     }
 
-    pub fn start(&self, nodes: Arc<Vec<AvailableNode>>) -> std::io::Result<()> {
+    pub fn start(&self, nodes: Arc<Vec<AvailableNode>>, projects: Option<PathBuf>) -> std::io::Result<()> {
         #[cfg(debug_assertions)]
         {
             println!("Starting server in debug mode...");
@@ -67,9 +183,15 @@ impl DisbotterRESTApi {
                 App::new()
                     .wrap(cors)
                     .wrap(Logger::default())
-                    .app_data(web::Data::new(nodes))
+                    .app_data(web::Data::new(DisbotterRESTApiConfig {
+                        nodes,
+                        projects: projects.clone(),
+                        can_run: projects.is_some(),
+                    }))
                     .route("/ping", web::get().to(ping))
+                    .route("/config", web::get().to(config))
                     .route("/compile", web::post().to(compile))
+                    .route("/cnr", web::post().to(compile_and_run))
             })
             .bind(("127.0.0.1", 3000))?
             .run()

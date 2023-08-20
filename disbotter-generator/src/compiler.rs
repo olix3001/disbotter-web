@@ -586,18 +586,18 @@ impl AvailableNode {
 // ===< Data structures >=== //
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DisbotterProjectData {
-    metadata: DisbotterProjectMetadata,
-    content: DisbotterProjectContent
+    pub metadata: DisbotterProjectMetadata,
+    pub content: DisbotterProjectContent
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DisbotterProjectMetadata {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DisbotterProjectContent {
-    commands: Vec<DisbotterProjectCommand>
+    pub commands: Vec<DisbotterProjectCommand>
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]

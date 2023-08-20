@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use compiler::{NodesJSCompiler, AvailableNode, upgrade_engine};
 use loader::{load_all_nodes, export_node_declarations, Node};
 use clap::{Parser, Subcommand, arg};
@@ -46,7 +48,9 @@ enum Commands {
     #[command(name="server", about="Start the REST API server")]
     Server {
         #[arg(short, long, help="Path to the directory/directories containing the nodes")]
-        nodes: String
+        nodes: String,
+        #[arg(short, long, help="Path to the directory containing the projects")]
+        projects: Option<PathBuf>,
     }
 }
 
@@ -143,20 +147,14 @@ fn main() {
             println!("{} {}", "To compile the project, run:".green(), format!("disbotter compile ... -o {}", std::path::PathBuf::from(path).join("src").to_str().unwrap()).yellow());
             println!("{} {}", "To run the project, go to the project directory and run:".green(), "npm/pnpm start".yellow());
         },
-        Some(Commands::Server { nodes }) => {
+        Some(Commands::Server { nodes, projects }) => {
             // If command is to start the server
-            // let paths = nodes.split(",");
-            // let nodes: Vec<Node> = paths.flat_map(|path| load_all_nodes(path.into()).unwrap_or_else(|err| {
-            //     println!("{} {}", "Failed to load nodes from path:".red(), path.to_string().yellow());
-            //     println!("{:?}", err);
-            //     vec![]
-            // })).collect();
             
             let api = server::DisbotterRESTApi::new();
             let mut engine = Engine::new();
             upgrade_engine(&mut engine);
             let nodes = AvailableNode::load_nodes(nodes.into(), &mut engine);
-            api.start(std::sync::Arc::new(nodes)).expect("Failed to start server");
+            api.start(std::sync::Arc::new(nodes), projects).expect("Failed to start server");
         },
         None => {
             println!("No command specified!");
