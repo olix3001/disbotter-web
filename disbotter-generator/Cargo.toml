@@ -13,6 +13,7 @@ actix-cors = "0.6.4"
 actix-web = "4.3.1"
 clap = { version = "4.3.21", features = ["derive"] }
 colored = "2.0.4"
+dotenv = "0.15.0"
 env_logger = "0.10.0"
 git2 = "0.17.2"
 regex = "1.9.3"

@@ -1,29 +1,37 @@
 <script lang="ts">
     import CompileLightIcon from "$lib/assets/compile_light.svg";
+    import BugLightIcon from "$lib/assets/bug_light.svg";
     import { PUBLIC_API_URL } from "$env/static/public";
 	import { getContext, onMount } from "svelte";
 	import { type ProjectContext, projectKey } from "$lib/editor/project";
 
     let api_available = false;
+    let api_can_run = false;
     
     let api_fetch: Promise<any>;
     
     onMount(() => {
         api_fetch = new Promise(async (resolve, reject) => {
             try {
-                const response = await fetch(PUBLIC_API_URL + '/ping', {
+                const response = await fetch(PUBLIC_API_URL + '/config', {
                     method: 'GET'
                 });
 
                 if (response.status != 200) {
                     api_available = false;
+                    api_can_run = false;
                     reject(response);
                 } else {
                     api_available = true;
+                    
+                    const data = await response.json();
+                    api_can_run = data.can_run;
+
                     resolve(response);
                 }
             } catch (e) {
                 api_available = false;
+                api_can_run = false;
                 reject(e);
             }
         });
@@ -34,6 +42,11 @@
     function handleCompileClick() {
         $PROJECT.compileWithApi();
     }
+
+    async function handleRunClick() {
+        const resp = $PROJECT.testWithApi();
+        console.log(await resp);
+    }
 </script>
 
 <div class="topbar">
@@ -42,6 +55,10 @@
             <img src={CompileLightIcon} alt="Compile button"/>
             Compile
         </button>
+        <button disabled={!api_available || !api_can_run} on:click={handleRunClick}
+            title={!api_can_run ? "Running is disabled on current API":""}>
+            <img src={BugLightIcon} alt="Test button"/>
+            Test
     </div>
     
     {#await api_fetch}

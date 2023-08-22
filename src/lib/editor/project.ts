@@ -221,6 +221,22 @@ export class DisbotterProject {
 		// TODO: Do something useful with the response
 		alert(await resp.text());
 	}
+
+	public async testWithApi(options?: any): Promise<Response> {
+		const resp = await fetch(PUBLIC_API_URL + '/cnr', {
+			// cnr = Compile And Run
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				project: this.toJSONParseable(),
+				options
+			})
+		});
+
+		return await resp;
+	}
 }
 
 export async function loadNodeDeclarations(file: string): Promise<NodeType[]> {

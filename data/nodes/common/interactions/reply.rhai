@@ -19,6 +19,7 @@ const inputs = #{
     ephemeral: #{
         name: "ephemeral",
         type: "boolean",
+        start_value: false,
         index: 2
     }
 };

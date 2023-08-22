@@ -55,6 +55,7 @@ enum Commands {
 }
 
 fn main() {
+    dotenv::dotenv().ok();
     let cli = Cli::parse();
 
     match cli.command {

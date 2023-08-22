@@ -592,7 +592,7 @@
       },
       "ephemeral": {
         "type": {
-          "type": 5,
+          "type": 3,
           "structTags": []
         },
         "name": "ephemeral"
@@ -607,7 +607,9 @@
         "name": "flow_out"
       }
     },
-    "defaultHardcoded": {}
+    "defaultHardcoded": {
+      "ephemeral": false
+    }
   },
   {
     "id": "_builtin_message_send",
@@ -1214,8 +1216,8 @@
       }
     },
     "defaultHardcoded": {
-      "max": 1,
-      "min": 0
+      "min": 0,
+      "max": 1
     }
   },
   {
